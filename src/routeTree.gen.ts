@@ -23,6 +23,7 @@ import { Route as AboutHmrRouteImport } from './routes/about-hmr'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PharmacistsSlugRouteImport } from './routes/pharmacists.$slug'
+import { Route as PagesSlugRouteImport } from './routes/pages.$slug'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -98,6 +99,11 @@ const PharmacistsSlugRoute = PharmacistsSlugRouteImport.update({
   path: '/pharmacists/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PagesSlugRoute = PagesSlugRouteImport.update({
+  id: '/pages/$slug',
+  path: '/pages/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/pages/$slug': typeof PagesSlugRoute
   '/pharmacists/$slug': typeof PharmacistsSlugRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/pages/$slug': typeof PagesSlugRoute
   '/pharmacists/$slug': typeof PharmacistsSlugRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/pages/$slug': typeof PagesSlugRoute
   '/pharmacists/$slug': typeof PharmacistsSlugRoute
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/onboarding'
+    | '/pages/$slug'
     | '/pharmacists/$slug'
     | '/admin/content'
     | '/admin/'
@@ -223,6 +233,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/dashboard'
     | '/onboarding'
+    | '/pages/$slug'
     | '/pharmacists/$slug'
     | '/admin/content'
     | '/admin'
@@ -244,6 +255,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
+    | '/pages/$slug'
     | '/pharmacists/$slug'
     | '/_authenticated/admin/content'
     | '/_authenticated/admin/'
@@ -263,6 +275,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  PagesSlugRoute: typeof PagesSlugRoute
   PharmacistsSlugRoute: typeof PharmacistsSlugRoute
 }
 
@@ -366,6 +379,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PharmacistsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pages/$slug': {
+      id: '/pages/$slug'
+      path: '/pages/$slug'
+      fullPath: '/pages/$slug'
+      preLoaderRoute: typeof PagesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/onboarding': {
       id: '/_authenticated/onboarding'
       path: '/onboarding'
@@ -447,8 +467,19 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  PagesSlugRoute: PagesSlugRoute,
   PharmacistsSlugRoute: PharmacistsSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
