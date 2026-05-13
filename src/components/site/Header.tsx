@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X, Stethoscope } from "lucide-react";
+import { Menu, X, Stethoscope, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 
 const nav = [
   { to: "/find", label: "Find a pharmacist" },
@@ -13,6 +14,7 @@ const nav = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -35,8 +37,14 @@ export function Header() {
           ))}
         </nav>
         <div className="hidden items-center gap-2 lg:flex">
-          <Button asChild variant="ghost" size="sm"><Link to="/auth">Sign in</Link></Button>
-          <Button asChild size="sm"><Link to="/for-pharmacists">Join as pharmacist</Link></Button>
+          {user ? (
+            <Button asChild size="sm" variant="outline"><Link to="/dashboard"><LayoutDashboard className="mr-1.5 h-4 w-4" />Dashboard</Link></Button>
+          ) : (
+            <>
+              <Button asChild variant="ghost" size="sm"><Link to="/auth">Sign in</Link></Button>
+              <Button asChild size="sm"><Link to="/auth">Join as pharmacist</Link></Button>
+            </>
+          )}
         </div>
         <button className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu">
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
