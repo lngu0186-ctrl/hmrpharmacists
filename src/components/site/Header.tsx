@@ -1,10 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X, LayoutDashboard } from "lucide-react";
+import { Menu, X, Stethoscope, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { NotificationBell } from "./NotificationBell";
-import logo from "@/assets/logo.png";
 
 const nav = [
   { to: "/find", label: "Find a pharmacist" },
@@ -20,9 +19,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight" aria-label="HMR Pharmacists Exchange — Home">
-          <img src={logo} alt="HMR Pharmacists Exchange" className="h-10 w-auto sm:h-11" />
-          <span className="sr-only">HMR Pharmacists Exchange</span>
+        <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
+          <span className="grid h-9 w-9 place-items-center rounded-lg bg-trust text-trust-foreground shadow-soft">
+            <Stethoscope className="h-5 w-5" />
+          </span>
+          <span className="text-base sm:text-lg">HMR Pharmacist Exchange</span>
         </Link>
         <nav className="hidden items-center gap-1 lg:flex">
           {nav.map((n) => (
