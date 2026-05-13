@@ -124,14 +124,37 @@ function FindPage() {
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-semibold sm:text-4xl">Find a credentialed pharmacist</h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">Search verified pharmacists for Home Medicines Reviews across Australia.</p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <div className="relative flex-1">
+          <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search suburb, postcode, name or specialty…" className="h-12 pl-10" />
+              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name or specialty…" className="h-12 pl-10" />
             </div>
+            <form
+              onSubmit={(e) => { e.preventDefault(); runGeocode(); }}
+              className="relative flex gap-2"
+            >
+              <div className="relative flex-1">
+                <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input value={near} onChange={(e) => setNear(e.target.value)} placeholder="Suburb, postcode or city…" className="h-12 pl-10" />
+              </div>
+              <Button type="submit" size="lg" variant="secondary" disabled={geocoding}>
+                {geocoding ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search near"}
+              </Button>
+            </form>
             <Button variant="outline" size="lg" onClick={() => setShowFilters((v) => !v)} className="lg:hidden">
               <Filter className="mr-2 h-4 w-4" /> Filters {activeCount > 0 && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">{activeCount}</span>}
             </Button>
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+            <button type="button" onClick={useMyLocation} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 hover:border-primary/40 hover:text-foreground">
+              <Navigation className="h-3 w-3" /> Use my location
+            </button>
+            {origin && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-trust/10 px-3 py-1.5 font-medium text-trust">
+                <MapPin className="h-3 w-3" /> Searching within {radius} km of {origin.label.split(",")[0]}
+                <button onClick={() => { setOrigin(null); setNear(""); }} className="ml-1 hover:opacity-70"><X className="h-3 w-3" /></button>
+              </span>
+            )}
           </div>
         </div>
       </section>
