@@ -37,8 +37,14 @@ export function Header() {
           ))}
         </nav>
         <div className="hidden items-center gap-2 lg:flex">
-          <Button asChild variant="ghost" size="sm"><Link to="/auth">Sign in</Link></Button>
-          <Button asChild size="sm"><Link to="/for-pharmacists">Join as pharmacist</Link></Button>
+          {user ? (
+            <Button asChild size="sm" variant="outline"><Link to="/dashboard"><LayoutDashboard className="mr-1.5 h-4 w-4" />Dashboard</Link></Button>
+          ) : (
+            <>
+              <Button asChild variant="ghost" size="sm"><Link to="/auth">Sign in</Link></Button>
+              <Button asChild size="sm"><Link to="/auth">Join as pharmacist</Link></Button>
+            </>
+          )}
         </div>
         <button className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu">
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
