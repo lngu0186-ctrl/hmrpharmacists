@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Stethoscope, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 export function Footer() {
   return (
@@ -8,8 +9,7 @@ export function Footer() {
         <div className="grid gap-10 lg:grid-cols-4">
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-trust text-trust-foreground"><Stethoscope className="h-5 w-5" /></span>
-              <span className="font-semibold">HMR Pharmacist Exchange</span>
+              <img src={logo} alt="HMR Pharmacists Exchange" className="h-12 w-auto" />
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
               The trusted referral and discovery platform for credentialed pharmacists providing Home Medicines Reviews in Australia.
