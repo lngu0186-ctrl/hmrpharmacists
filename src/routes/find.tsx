@@ -1,14 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, MapPin, Filter, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { Search, MapPin, Filter, X, Navigation, Loader2 } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { PharmacistCard, type PharmacistCardData } from "@/components/site/PharmacistCard";
 import { supabase } from "@/integrations/supabase/client";
+import { geocodeAU } from "@/lib/geocode.functions";
+import { haversineKm } from "@/lib/geo";
 
 export const Route = createFileRoute("/find")({
   component: FindPage,
