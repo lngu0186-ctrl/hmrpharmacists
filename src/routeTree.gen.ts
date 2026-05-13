@@ -9,38 +9,275 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ForPharmacistsRouteImport } from './routes/for-pharmacists'
+import { Route as ForPharmaciesRouteImport } from './routes/for-pharmacies'
+import { Route as ForPatientsRouteImport } from './routes/for-patients'
+import { Route as ForGpsRouteImport } from './routes/for-gps'
+import { Route as FindRouteImport } from './routes/find'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AboutHmrRouteImport } from './routes/about-hmr'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PharmacistsSlugRouteImport } from './routes/pharmacists.$slug'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForPharmacistsRoute = ForPharmacistsRouteImport.update({
+  id: '/for-pharmacists',
+  path: '/for-pharmacists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForPharmaciesRoute = ForPharmaciesRouteImport.update({
+  id: '/for-pharmacies',
+  path: '/for-pharmacies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForPatientsRoute = ForPatientsRouteImport.update({
+  id: '/for-patients',
+  path: '/for-patients',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForGpsRoute = ForGpsRouteImport.update({
+  id: '/for-gps',
+  path: '/for-gps',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FindRoute = FindRouteImport.update({
+  id: '/find',
+  path: '/find',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutHmrRoute = AboutHmrRouteImport.update({
+  id: '/about-hmr',
+  path: '/about-hmr',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PharmacistsSlugRoute = PharmacistsSlugRouteImport.update({
+  id: '/pharmacists/$slug',
+  path: '/pharmacists/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about-hmr': typeof AboutHmrRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/find': typeof FindRoute
+  '/for-gps': typeof ForGpsRoute
+  '/for-patients': typeof ForPatientsRoute
+  '/for-pharmacies': typeof ForPharmaciesRoute
+  '/for-pharmacists': typeof ForPharmacistsRoute
+  '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
+  '/pharmacists/$slug': typeof PharmacistsSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about-hmr': typeof AboutHmrRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/find': typeof FindRoute
+  '/for-gps': typeof ForGpsRoute
+  '/for-patients': typeof ForPatientsRoute
+  '/for-pharmacies': typeof ForPharmaciesRoute
+  '/for-pharmacists': typeof ForPharmacistsRoute
+  '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
+  '/pharmacists/$slug': typeof PharmacistsSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about-hmr': typeof AboutHmrRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/find': typeof FindRoute
+  '/for-gps': typeof ForGpsRoute
+  '/for-patients': typeof ForPatientsRoute
+  '/for-pharmacies': typeof ForPharmaciesRoute
+  '/for-pharmacists': typeof ForPharmacistsRoute
+  '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
+  '/pharmacists/$slug': typeof PharmacistsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about-hmr'
+    | '/auth'
+    | '/contact'
+    | '/find'
+    | '/for-gps'
+    | '/for-patients'
+    | '/for-pharmacies'
+    | '/for-pharmacists'
+    | '/privacy'
+    | '/sitemap.xml'
+    | '/terms'
+    | '/pharmacists/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about-hmr'
+    | '/auth'
+    | '/contact'
+    | '/find'
+    | '/for-gps'
+    | '/for-patients'
+    | '/for-pharmacies'
+    | '/for-pharmacists'
+    | '/privacy'
+    | '/sitemap.xml'
+    | '/terms'
+    | '/pharmacists/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/about-hmr'
+    | '/auth'
+    | '/contact'
+    | '/find'
+    | '/for-gps'
+    | '/for-patients'
+    | '/for-pharmacies'
+    | '/for-pharmacists'
+    | '/privacy'
+    | '/sitemap.xml'
+    | '/terms'
+    | '/pharmacists/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutHmrRoute: typeof AboutHmrRoute
+  AuthRoute: typeof AuthRoute
+  ContactRoute: typeof ContactRoute
+  FindRoute: typeof FindRoute
+  ForGpsRoute: typeof ForGpsRoute
+  ForPatientsRoute: typeof ForPatientsRoute
+  ForPharmaciesRoute: typeof ForPharmaciesRoute
+  ForPharmacistsRoute: typeof ForPharmacistsRoute
+  PrivacyRoute: typeof PrivacyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermsRoute: typeof TermsRoute
+  PharmacistsSlugRoute: typeof PharmacistsSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-pharmacists': {
+      id: '/for-pharmacists'
+      path: '/for-pharmacists'
+      fullPath: '/for-pharmacists'
+      preLoaderRoute: typeof ForPharmacistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-pharmacies': {
+      id: '/for-pharmacies'
+      path: '/for-pharmacies'
+      fullPath: '/for-pharmacies'
+      preLoaderRoute: typeof ForPharmaciesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-patients': {
+      id: '/for-patients'
+      path: '/for-patients'
+      fullPath: '/for-patients'
+      preLoaderRoute: typeof ForPatientsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-gps': {
+      id: '/for-gps'
+      path: '/for-gps'
+      fullPath: '/for-gps'
+      preLoaderRoute: typeof ForGpsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/find': {
+      id: '/find'
+      path: '/find'
+      fullPath: '/find'
+      preLoaderRoute: typeof FindRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about-hmr': {
+      id: '/about-hmr'
+      path: '/about-hmr'
+      fullPath: '/about-hmr'
+      preLoaderRoute: typeof AboutHmrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +285,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pharmacists/$slug': {
+      id: '/pharmacists/$slug'
+      path: '/pharmacists/$slug'
+      fullPath: '/pharmacists/$slug'
+      preLoaderRoute: typeof PharmacistsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutHmrRoute: AboutHmrRoute,
+  AuthRoute: AuthRoute,
+  ContactRoute: ContactRoute,
+  FindRoute: FindRoute,
+  ForGpsRoute: ForGpsRoute,
+  ForPatientsRoute: ForPatientsRoute,
+  ForPharmaciesRoute: ForPharmaciesRoute,
+  ForPharmacistsRoute: ForPharmacistsRoute,
+  PrivacyRoute: PrivacyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermsRoute: TermsRoute,
+  PharmacistsSlugRoute: PharmacistsSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
