@@ -92,22 +92,31 @@ function FindPage() {
   const filtered = useMemo(() => {
     if (!data) return [];
     const needle = q.trim().toLowerCase();
-    return data.filter((p) => {
+    const withDist = data.map((p: any) => ({
+      ...p,
+      distance_km: origin && p.latitude != null && p.longitude != null
+        ? haversineKm(origin, { lat: Number(p.latitude), lng: Number(p.longitude) })
+        : undefined,
+    }));
+    const list = withDist.filter((p) => {
       if (accepting && !p.accepting_referrals) return false;
       if (telehealth && !p.telehealth) return false;
       if (homeVisits && !p.home_visits) return false;
       if (specialties.length && !specialties.some((s) => p.specialties.includes(s))) return false;
+      if (origin && typeof p.distance_km === "number" && p.distance_km > radius) return false;
       if (needle) {
         const hay = `${p.full_name} ${p.suburb ?? ""} ${p.postcode ?? ""} ${p.state ?? ""} ${p.specialties.join(" ")} ${p.bio ?? ""}`.toLowerCase();
         if (!hay.includes(needle)) return false;
       }
       return true;
     });
-  }, [data, q, accepting, telehealth, homeVisits, specialties]);
+    if (origin) list.sort((a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity));
+    return list;
+  }, [data, q, accepting, telehealth, homeVisits, specialties, origin, radius]);
 
   const toggleSpecialty = (s: string) => setSpecialties((cur) => cur.includes(s) ? cur.filter((x) => x !== s) : [...cur, s]);
-  const clearAll = () => { setQ(""); setAccepting(false); setTelehealth(false); setHomeVisits(false); setSpecialties([]); };
-  const activeCount = (accepting?1:0)+(telehealth?1:0)+(homeVisits?1:0)+specialties.length;
+  const clearAll = () => { setQ(""); setAccepting(false); setTelehealth(false); setHomeVisits(false); setSpecialties([]); setNear(""); setOrigin(null); };
+  const activeCount = (accepting?1:0)+(telehealth?1:0)+(homeVisits?1:0)+specialties.length+(origin?1:0);
 
   return (
     <SiteShell>
