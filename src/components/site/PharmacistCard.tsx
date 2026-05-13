@@ -17,6 +17,7 @@ export interface PharmacistCardData {
   accepting_referrals: boolean;
   turnaround_days: number | null;
   specialties?: string[];
+  distance_km?: number;
 }
 
 export function PharmacistCard({ p }: { p: PharmacistCardData }) {
