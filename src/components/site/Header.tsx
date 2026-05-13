@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X, Stethoscope } from "lucide-react";
+import { Menu, X, Stethoscope, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 
 const nav = [
   { to: "/find", label: "Find a pharmacist" },
