@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect, useNavigate, Link, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LayoutDashboard, UserCog, ShieldCheck, LogOut } from "lucide-react";
+import { LayoutDashboard, UserCog, ShieldCheck, LogOut, FileText } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { Button } from "@/components/ui/button";
 import { useAuth, signOut } from "@/hooks/use-auth";
