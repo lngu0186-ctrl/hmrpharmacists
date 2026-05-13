@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Menu, X, Stethoscope, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { NotificationBell } from "./NotificationBell";
 
 const nav = [
   { to: "/find", label: "Find a pharmacist" },
