@@ -38,7 +38,10 @@ export function Header() {
         </nav>
         <div className="hidden items-center gap-2 lg:flex">
           {user ? (
-            <Button asChild size="sm" variant="outline"><Link to="/dashboard"><LayoutDashboard className="mr-1.5 h-4 w-4" />Dashboard</Link></Button>
+            <>
+              <NotificationBell />
+              <Button asChild size="sm" variant="outline"><Link to="/dashboard"><LayoutDashboard className="mr-1.5 h-4 w-4" />Dashboard</Link></Button>
+            </>
           ) : (
             <>
               <Button asChild variant="ghost" size="sm"><Link to="/auth">Sign in</Link></Button>
