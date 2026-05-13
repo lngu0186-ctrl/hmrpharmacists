@@ -38,13 +38,45 @@ function FindPage() {
   const [homeVisits, setHomeVisits] = useState(false);
   const [specialties, setSpecialties] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [near, setNear] = useState("");
+  const [radius, setRadius] = useState(50);
+  const [origin, setOrigin] = useState<{ lat: number; lng: number; label: string } | null>(null);
+  const [geocoding, setGeocoding] = useState(false);
+  const geocode = useServerFn(geocodeAU);
+
+  const runGeocode = async () => {
+    if (!near.trim()) { setOrigin(null); return; }
+    setGeocoding(true);
+    try {
+      const r = await geocode({ data: { query: near.trim() } });
+      if (!r) { toast.error("Couldn't find that location"); setOrigin(null); }
+      else setOrigin(r);
+    } catch (e: any) {
+      toast.error(e.message ?? "Geocoding failed");
+    } finally {
+      setGeocoding(false);
+    }
+  };
+
+  const useMyLocation = () => {
+    if (!navigator.geolocation) return toast.error("Geolocation not supported");
+    setGeocoding(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setOrigin({ lat: pos.coords.latitude, lng: pos.coords.longitude, label: "My current location" });
+        setNear("My location");
+        setGeocoding(false);
+      },
+      () => { toast.error("Couldn't get your location"); setGeocoding(false); },
+    );
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ["pharmacists-list"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pharmacists")
-        .select("id,slug,full_name,title,bio,photo_url,suburb,state,postcode,telehealth,home_visits,accepting_referrals,turnaround_days,pharmacist_specialties(specialty),pharmacist_languages(language)")
+        .select("id,slug,full_name,title,bio,photo_url,suburb,state,postcode,telehealth,home_visits,accepting_referrals,turnaround_days,latitude,longitude,pharmacist_specialties(specialty),pharmacist_languages(language)")
         .eq("is_published", true)
         .eq("verification_status", "verified")
         .order("full_name");
