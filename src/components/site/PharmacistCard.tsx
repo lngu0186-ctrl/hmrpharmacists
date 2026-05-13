@@ -17,6 +17,7 @@ export interface PharmacistCardData {
   accepting_referrals: boolean;
   turnaround_days: number | null;
   specialties?: string[];
+  distance_km?: number;
 }
 
 export function PharmacistCard({ p }: { p: PharmacistCardData }) {
@@ -37,6 +38,9 @@ export function PharmacistCard({ p }: { p: PharmacistCardData }) {
           <p className="mt-0.5 text-sm text-muted-foreground">{p.title ?? "Credentialed Pharmacist"}</p>
           <p className="mt-1 inline-flex items-center gap-1 text-sm text-muted-foreground">
             <MapPin className="h-3.5 w-3.5" /> {p.suburb}, {p.state}
+            {typeof p.distance_km === "number" && (
+              <span className="ml-2 rounded-full bg-trust/10 px-2 py-0.5 text-[11px] font-medium text-trust">{p.distance_km.toFixed(1)} km away</span>
+            )}
           </p>
         </div>
       </div>

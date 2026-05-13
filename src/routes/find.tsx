@@ -1,14 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, MapPin, Filter, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { Search, MapPin, Filter, X, Navigation, Loader2 } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { PharmacistCard, type PharmacistCardData } from "@/components/site/PharmacistCard";
 import { supabase } from "@/integrations/supabase/client";
+import { geocodeAU } from "@/lib/geocode.functions";
+import { haversineKm } from "@/lib/geo";
 
 export const Route = createFileRoute("/find")({
   component: FindPage,
@@ -33,13 +38,45 @@ function FindPage() {
   const [homeVisits, setHomeVisits] = useState(false);
   const [specialties, setSpecialties] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [near, setNear] = useState("");
+  const [radius, setRadius] = useState(50);
+  const [origin, setOrigin] = useState<{ lat: number; lng: number; label: string } | null>(null);
+  const [geocoding, setGeocoding] = useState(false);
+  const geocode = useServerFn(geocodeAU);
+
+  const runGeocode = async () => {
+    if (!near.trim()) { setOrigin(null); return; }
+    setGeocoding(true);
+    try {
+      const r = await geocode({ data: { query: near.trim() } });
+      if (!r) { toast.error("Couldn't find that location"); setOrigin(null); }
+      else setOrigin(r);
+    } catch (e: any) {
+      toast.error(e.message ?? "Geocoding failed");
+    } finally {
+      setGeocoding(false);
+    }
+  };
+
+  const useMyLocation = () => {
+    if (!navigator.geolocation) return toast.error("Geolocation not supported");
+    setGeocoding(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setOrigin({ lat: pos.coords.latitude, lng: pos.coords.longitude, label: "My current location" });
+        setNear("My location");
+        setGeocoding(false);
+      },
+      () => { toast.error("Couldn't get your location"); setGeocoding(false); },
+    );
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ["pharmacists-list"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pharmacists")
-        .select("id,slug,full_name,title,bio,photo_url,suburb,state,postcode,telehealth,home_visits,accepting_referrals,turnaround_days,pharmacist_specialties(specialty),pharmacist_languages(language)")
+        .select("id,slug,full_name,title,bio,photo_url,suburb,state,postcode,telehealth,home_visits,accepting_referrals,turnaround_days,latitude,longitude,pharmacist_specialties(specialty),pharmacist_languages(language)")
         .eq("is_published", true)
         .eq("verification_status", "verified")
         .order("full_name");
@@ -55,22 +92,31 @@ function FindPage() {
   const filtered = useMemo(() => {
     if (!data) return [];
     const needle = q.trim().toLowerCase();
-    return data.filter((p) => {
+    const withDist = data.map((p: any) => ({
+      ...p,
+      distance_km: origin && p.latitude != null && p.longitude != null
+        ? haversineKm(origin, { lat: Number(p.latitude), lng: Number(p.longitude) })
+        : undefined,
+    }));
+    const list = withDist.filter((p) => {
       if (accepting && !p.accepting_referrals) return false;
       if (telehealth && !p.telehealth) return false;
       if (homeVisits && !p.home_visits) return false;
       if (specialties.length && !specialties.some((s) => p.specialties.includes(s))) return false;
+      if (origin && typeof p.distance_km === "number" && p.distance_km > radius) return false;
       if (needle) {
         const hay = `${p.full_name} ${p.suburb ?? ""} ${p.postcode ?? ""} ${p.state ?? ""} ${p.specialties.join(" ")} ${p.bio ?? ""}`.toLowerCase();
         if (!hay.includes(needle)) return false;
       }
       return true;
     });
-  }, [data, q, accepting, telehealth, homeVisits, specialties]);
+    if (origin) list.sort((a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity));
+    return list;
+  }, [data, q, accepting, telehealth, homeVisits, specialties, origin, radius]);
 
   const toggleSpecialty = (s: string) => setSpecialties((cur) => cur.includes(s) ? cur.filter((x) => x !== s) : [...cur, s]);
-  const clearAll = () => { setQ(""); setAccepting(false); setTelehealth(false); setHomeVisits(false); setSpecialties([]); };
-  const activeCount = (accepting?1:0)+(telehealth?1:0)+(homeVisits?1:0)+specialties.length;
+  const clearAll = () => { setQ(""); setAccepting(false); setTelehealth(false); setHomeVisits(false); setSpecialties([]); setNear(""); setOrigin(null); };
+  const activeCount = (accepting?1:0)+(telehealth?1:0)+(homeVisits?1:0)+specialties.length+(origin?1:0);
 
   return (
     <SiteShell>
@@ -78,14 +124,37 @@ function FindPage() {
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-semibold sm:text-4xl">Find a credentialed pharmacist</h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">Search verified pharmacists for Home Medicines Reviews across Australia.</p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <div className="relative flex-1">
+          <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search suburb, postcode, name or specialty…" className="h-12 pl-10" />
+              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name or specialty…" className="h-12 pl-10" />
             </div>
+            <form
+              onSubmit={(e) => { e.preventDefault(); runGeocode(); }}
+              className="relative flex gap-2"
+            >
+              <div className="relative flex-1">
+                <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input value={near} onChange={(e) => setNear(e.target.value)} placeholder="Suburb, postcode or city…" className="h-12 pl-10" />
+              </div>
+              <Button type="submit" size="lg" variant="secondary" disabled={geocoding}>
+                {geocoding ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search near"}
+              </Button>
+            </form>
             <Button variant="outline" size="lg" onClick={() => setShowFilters((v) => !v)} className="lg:hidden">
               <Filter className="mr-2 h-4 w-4" /> Filters {activeCount > 0 && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">{activeCount}</span>}
             </Button>
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+            <button type="button" onClick={useMyLocation} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 hover:border-primary/40 hover:text-foreground">
+              <Navigation className="h-3 w-3" /> Use my location
+            </button>
+            {origin && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-trust/10 px-3 py-1.5 font-medium text-trust">
+                <MapPin className="h-3 w-3" /> Searching within {radius} km of {origin.label.split(",")[0]}
+                <button onClick={() => { setOrigin(null); setNear(""); }} className="ml-1 hover:opacity-70"><X className="h-3 w-3" /></button>
+              </span>
+            )}
           </div>
         </div>
       </section>
@@ -104,6 +173,16 @@ function FindPage() {
                 <ToggleRow label="Telehealth available" checked={telehealth} onChange={setTelehealth} />
                 <ToggleRow label="Home visits available" checked={homeVisits} onChange={setHomeVisits} />
               </div>
+
+              {origin && (
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Search radius</h3>
+                    <span className="text-xs font-medium text-foreground">{radius} km</span>
+                  </div>
+                  <Slider value={[radius]} min={5} max={250} step={5} onValueChange={(v) => setRadius(v[0])} />
+                </div>
+              )}
 
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Specialties</h3>
