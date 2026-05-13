@@ -174,6 +174,16 @@ function FindPage() {
                 <ToggleRow label="Home visits available" checked={homeVisits} onChange={setHomeVisits} />
               </div>
 
+              {origin && (
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Search radius</h3>
+                    <span className="text-xs font-medium text-foreground">{radius} km</span>
+                  </div>
+                  <Slider value={[radius]} min={5} max={250} step={5} onValueChange={(v) => setRadius(v[0])} />
+                </div>
+              )}
+
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Specialties</h3>
                 <div className="mt-3 flex flex-wrap gap-1.5">
