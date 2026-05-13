@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({ meta: [{ title: "Admin — HMR Pharmacist Exchange" }, { name: "robots", content: "noindex" }] }),
 });
 
-const COLORS = ["hsl(var(--primary))", "hsl(var(--accent))", "hsl(var(--muted-foreground))", "hsl(var(--success, 142 70% 45%))"];
+const COLORS = ["var(--primary)", "var(--accent)", "var(--destructive)", "var(--success)"];
 
 function AdminPage() {
   const qc = useQueryClient();
