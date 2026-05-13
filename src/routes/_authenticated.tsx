@@ -28,7 +28,10 @@ function AuthedLayout() {
   const links = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/onboarding", label: "My profile", icon: UserCog },
-    ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: ShieldCheck }] : []),
+    ...(isAdmin ? [
+      { to: "/admin", label: "Admin", icon: ShieldCheck },
+      { to: "/admin/content", label: "Content", icon: FileText },
+    ] : []),
   ] as const;
 
   return (
