@@ -21,6 +21,7 @@ const COLORS = ["var(--primary)", "var(--accent)", "var(--destructive)", "var(--
 
 function AdminPage() {
   const qc = useQueryClient();
+  const sendVerification = useServerFn(sendVerificationEmail);
 
   const { data: pharmacists = [] } = useQuery({
     queryKey: ["admin-pharmacists"],
