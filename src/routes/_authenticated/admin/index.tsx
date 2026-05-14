@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { CheckCircle2, XCircle, Eye, EyeOff, Users, ShieldCheck, Inbox, MapPin } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, PieChart, Pie, Cell, Legend } from "recharts";
@@ -39,14 +39,28 @@ function AdminPage() {
     },
   });
 
-  const { data: emailLog = [] } = useQuery({
-    queryKey: ["admin-email-log"],
+  const PAGE_SIZE = 25;
+  const [emailPage, setEmailPage] = useState(0);
+  const [emailStatusFilter, setEmailStatusFilter] = useState<"all" | "sent" | "failed">("all");
+
+  const { data: emailLogPage } = useQuery({
+    queryKey: ["admin-email-log", emailPage, emailStatusFilter],
     queryFn: async () => {
-      const { data } = await supabase.from("email_send_log").select("*").order("created_at", { ascending: false }).limit(200);
-      return data ?? [];
+      let q = supabase
+        .from("email_send_log")
+        .select("*", { count: "exact" })
+        .order("created_at", { ascending: false })
+        .range(emailPage * PAGE_SIZE, emailPage * PAGE_SIZE + PAGE_SIZE - 1);
+      if (emailStatusFilter !== "all") q = q.eq("status", emailStatusFilter);
+      const { data, count } = await q;
+      return { rows: data ?? [], count: count ?? 0 };
     },
     refetchInterval: 30_000,
+    placeholderData: (prev) => prev,
   });
+  const emailLog = emailLogPage?.rows ?? [];
+  const emailLogTotal = emailLogPage?.count ?? 0;
+  const emailLogPages = Math.max(1, Math.ceil(emailLogTotal / PAGE_SIZE));
 
   const stats = useMemo(() => {
     const total = pharmacists.length;
@@ -128,7 +142,7 @@ function AdminPage() {
           <TabsTrigger value="queue">Verification queue ({stats.pending})</TabsTrigger>
           <TabsTrigger value="all">All pharmacists ({stats.total})</TabsTrigger>
           <TabsTrigger value="enquiries">Enquiries ({stats.enquiriesTotal})</TabsTrigger>
-          <TabsTrigger value="emails">Email log ({emailLog.length})</TabsTrigger>
+          <TabsTrigger value="emails">Email log ({emailLogTotal})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="queue">
@@ -168,8 +182,32 @@ function AdminPage() {
         </TabsContent>
 
         <TabsContent value="emails">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <div className="flex gap-1">
+              {(["all", "sent", "failed"] as const).map((s) => (
+                <Button
+                  key={s}
+                  size="sm"
+                  variant={emailStatusFilter === s ? "default" : "outline"}
+                  onClick={() => { setEmailStatusFilter(s); setEmailPage(0); }}
+                  className="capitalize h-7 px-3 text-xs"
+                >
+                  {s}
+                </Button>
+              ))}
+            </div>
+            <span className="ml-auto text-xs text-muted-foreground">
+              {emailLogTotal === 0
+                ? "0 results"
+                : `${emailPage * PAGE_SIZE + 1}–${Math.min((emailPage + 1) * PAGE_SIZE, emailLogTotal)} of ${emailLogTotal}`}
+            </span>
+            <div className="flex gap-1">
+              <Button size="sm" variant="outline" disabled={emailPage === 0} onClick={() => setEmailPage((p) => Math.max(0, p - 1))} className="h-7 px-3 text-xs">Prev</Button>
+              <Button size="sm" variant="outline" disabled={emailPage >= emailLogPages - 1} onClick={() => setEmailPage((p) => p + 1)} className="h-7 px-3 text-xs">Next</Button>
+            </div>
+          </div>
           <Card className="divide-y divide-border">
-            {emailLog.length === 0 && <p className="p-8 text-center text-sm text-muted-foreground">No emails sent yet.</p>}
+            {emailLog.length === 0 && <p className="p-8 text-center text-sm text-muted-foreground">No emails to show.</p>}
             {emailLog.map((row: any) => (
               <div key={row.id} className="grid gap-1 p-4 text-sm">
                 <div className="flex flex-wrap items-center gap-2">
