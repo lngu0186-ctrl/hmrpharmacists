@@ -40,25 +40,97 @@ function esc(s: string) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string));
 }
 
-async function resendSend(to: string, subject: string, html: string, replyTo?: string) {
+async function logEmail(entry: {
+  template_name: string;
+  recipient_email: string;
+  subject: string;
+  status: "sent" | "failed";
+  error_message?: string | null;
+  metadata?: Record<string, unknown>;
+  message_id?: string | null;
+}) {
+  try {
+    await supabaseAdmin.from("email_send_log").insert({
+      template_name: entry.template_name,
+      recipient_email: entry.recipient_email,
+      subject: entry.subject,
+      status: entry.status,
+      error_message: entry.error_message ?? null,
+      metadata: entry.metadata ?? null,
+      message_id: entry.message_id ?? null,
+    });
+  } catch (e) {
+    console.error("[email_send_log] insert failed", e);
+  }
+}
+
+async function resendSend(
+  to: string,
+  subject: string,
+  html: string,
+  replyTo?: string,
+  logCtx?: { template_name: string; metadata?: Record<string, unknown> },
+) {
   const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
   const RESEND_API_KEY = process.env.RESEND_API_KEY;
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
   if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY is not configured");
 
-  const res = await fetch(`${GATEWAY_URL}/emails`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${LOVABLE_API_KEY}`,
-      "X-Connection-Api-Key": RESEND_API_KEY,
-    },
-    body: JSON.stringify({ from: FROM, to: [to], subject, html, reply_to: replyTo ?? REPLY_TO }),
-  });
-  const body = await res.text();
+  let res: Response;
+  let body = "";
+  try {
+    res = await fetch(`${GATEWAY_URL}/emails`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "X-Connection-Api-Key": RESEND_API_KEY,
+      },
+      body: JSON.stringify({ from: FROM, to: [to], subject, html, reply_to: replyTo ?? REPLY_TO }),
+    });
+    body = await res.text();
+  } catch (e: any) {
+    if (logCtx) {
+      await logEmail({
+        template_name: logCtx.template_name,
+        recipient_email: to,
+        subject,
+        status: "failed",
+        error_message: `Network error: ${e?.message ?? String(e)}`,
+        metadata: logCtx.metadata,
+      });
+    }
+    throw e;
+  }
+
   if (!res.ok) {
     console.error(`[resend] send failed [${res.status}]: ${body}`);
+    if (logCtx) {
+      await logEmail({
+        template_name: logCtx.template_name,
+        recipient_email: to,
+        subject,
+        status: "failed",
+        error_message: `HTTP ${res.status}: ${body.slice(0, 500)}`,
+        metadata: logCtx.metadata,
+      });
+    }
     throw new Error(`Email send failed (${res.status})`);
+  }
+
+  let messageId: string | null = null;
+  try {
+    messageId = JSON.parse(body)?.id ?? null;
+  } catch {}
+  if (logCtx) {
+    await logEmail({
+      template_name: logCtx.template_name,
+      recipient_email: to,
+      subject,
+      status: "sent",
+      metadata: logCtx.metadata,
+      message_id: messageId,
+    });
   }
   return { ok: true };
 }
