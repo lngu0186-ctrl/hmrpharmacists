@@ -308,13 +308,11 @@ function EnquirySheet({
   );
 }
 
-function describeEvent(ev: {
-  event_type: string;
-  metadata: { from?: string; to?: string; decline_reason?: string | null } | null;
-}) {
+function describeEvent(ev: { event_type: string; metadata: unknown }) {
   if (ev.event_type === "created") return "Enquiry submitted";
   if (ev.event_type === "status_changed") {
-    const to = ev.metadata?.to ? STATUS_LABEL[ev.metadata.to as EnquiryRow["status"]] ?? ev.metadata.to : "updated";
+    const md = (ev.metadata ?? {}) as { to?: string };
+    const to = md.to ? STATUS_LABEL[md.to as EnquiryRow["status"]] ?? md.to : "updated";
     return `Status changed to ${to}`;
   }
   return ev.event_type;
