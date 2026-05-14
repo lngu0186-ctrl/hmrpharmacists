@@ -1,6 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Mail, MapPin, Sparkles, Inbox, ExternalLink, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import {
+  Mail,
+  MapPin,
+  Sparkles,
+  Inbox,
+  ExternalLink,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,7 +18,12 @@ import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
-  head: () => ({ meta: [{ title: "Dashboard — HMR Pharmacist Exchange" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [
+      { title: "Dashboard — HMR Pharmacist Exchange" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 function DashboardPage() {
@@ -48,7 +62,8 @@ function DashboardPage() {
       <Card className="p-8">
         <h1 className="text-2xl font-semibold tracking-tight">Welcome</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          You haven't created your pharmacist profile yet. Complete the onboarding wizard to get listed in the directory.
+          You haven't created your pharmacist profile yet. Complete the onboarding wizard to get
+          listed in the directory.
         </p>
         <Button asChild className="mt-6">
           <Link to="/onboarding">Start onboarding</Link>
@@ -63,8 +78,12 @@ function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Welcome back, {pharmacist.full_name}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Manage your profile and incoming referral enquiries.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Welcome back, {pharmacist.full_name}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Manage your profile and incoming referral enquiries.
+          </p>
         </div>
         <div className="flex gap-2">
           <Button asChild variant="outline" size="sm">
@@ -79,9 +98,27 @@ function DashboardPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Verification" value={pharmacist.verification_status} icon={ShieldIcon(pharmacist.verification_status)} />
-        <StatCard label="Listed" value={pharmacist.is_published ? "Public" : "Hidden"} icon={pharmacist.is_published ? <CheckCircle2 className="h-4 w-4 text-success" /> : <AlertCircle className="h-4 w-4 text-muted-foreground" />} />
-        <StatCard label="New enquiries" value={String(newCount)} icon={<Inbox className="h-4 w-4 text-primary" />} />
+        <StatCard
+          label="Verification"
+          value={pharmacist.verification_status}
+          icon={ShieldIcon(pharmacist.verification_status)}
+        />
+        <StatCard
+          label="Listed"
+          value={pharmacist.is_published ? "Public" : "Hidden"}
+          icon={
+            pharmacist.is_published ? (
+              <CheckCircle2 className="h-4 w-4 text-success" />
+            ) : (
+              <AlertCircle className="h-4 w-4 text-muted-foreground" />
+            )
+          }
+        />
+        <StatCard
+          label="New enquiries"
+          value={String(newCount)}
+          icon={<Inbox className="h-4 w-4 text-primary" />}
+        />
       </div>
 
       {pharmacist.verification_status !== "verified" && (
@@ -90,7 +127,10 @@ function DashboardPage() {
             <Sparkles className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             <div className="text-sm">
               <p className="font-medium">Your profile is awaiting admin verification.</p>
-              <p className="mt-1 text-muted-foreground">Once verified, your profile will appear in public search results. We typically review submissions within 2 business days.</p>
+              <p className="mt-1 text-muted-foreground">
+                Once verified, your profile will appear in public search results. We typically
+                review submissions within 2 business days.
+              </p>
             </div>
           </div>
         </Card>
@@ -102,7 +142,10 @@ function DashboardPage() {
           <Badge variant="secondary">{enquiries.length} total</Badge>
         </div>
         {enquiries.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">No enquiries yet. Once GPs and pharmacies discover your profile, their messages will appear here.</p>
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            No enquiries yet. Once GPs and pharmacies discover your profile, their messages will
+            appear here.
+          </p>
         ) : (
           <div className="divide-y divide-border">
             {enquiries.map((e: any) => (
@@ -110,14 +153,29 @@ function DashboardPage() {
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium">{e.sender_name}</span>
-                    <Badge variant="outline" className="text-[10px] capitalize">{e.sender_type}</Badge>
-                    {e.organisation && <span className="text-xs text-muted-foreground">· {e.organisation}</span>}
+                    <Badge variant="outline" className="text-[10px] capitalize">
+                      {e.sender_type}
+                    </Badge>
+                    {e.organisation && (
+                      <span className="text-xs text-muted-foreground">· {e.organisation}</span>
+                    )}
                   </div>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{e.message}</p>
                   <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-muted-foreground">
-                    <span className="inline-flex items-center gap-1"><Mail className="h-3 w-3" />{e.sender_email}</span>
-                    {e.patient_suburb && <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" />{e.patient_suburb} {e.patient_postcode}</span>}
-                    <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" />{new Date(e.created_at).toLocaleDateString("en-AU")}</span>
+                    <span className="inline-flex items-center gap-1">
+                      <Mail className="h-3 w-3" />
+                      {e.sender_email}
+                    </span>
+                    {e.patient_suburb && (
+                      <span className="inline-flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {e.patient_suburb} {e.patient_postcode}
+                      </span>
+                    )}
+                    <span className="inline-flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {new Date(e.created_at).toLocaleDateString("en-AU")}
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -160,5 +218,11 @@ function StatusPill({ status }: { status: string }) {
     completed: "bg-success/10 text-success",
     declined: "bg-muted text-muted-foreground",
   };
-  return <span className={`rounded-full px-2.5 py-1 text-[10px] font-medium capitalize ${map[status] ?? "bg-muted"}`}>{status.replace("_", " ")}</span>;
+  return (
+    <span
+      className={`rounded-full px-2.5 py-1 text-[10px] font-medium capitalize ${map[status] ?? "bg-muted"}`}
+    >
+      {status.replace("_", " ")}
+    </span>
+  );
 }

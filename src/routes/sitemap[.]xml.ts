@@ -20,7 +20,8 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const entries: { path: string; changefreq: string; priority: string; lastmod?: string }[] = [...STATIC_PATHS];
+        const entries: { path: string; changefreq: string; priority: string; lastmod?: string }[] =
+          [...STATIC_PATHS];
 
         try {
           const url = process.env.SUPABASE_URL;

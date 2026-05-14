@@ -1,4 +1,11 @@
-import { createFileRoute, Outlet, redirect, useNavigate, Link, useRouterState } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Outlet,
+  redirect,
+  useNavigate,
+  Link,
+  useRouterState,
+} from "@tanstack/react-router";
 import { useEffect } from "react";
 import { LayoutDashboard, UserCog, ShieldCheck, LogOut, FileText, ImageIcon } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
@@ -29,10 +36,12 @@ function AuthedLayout() {
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/profile", label: "My profile", icon: ImageIcon },
     { to: "/onboarding", label: "Edit details", icon: UserCog },
-    ...(isAdmin ? [
-      { to: "/admin", label: "Admin", icon: ShieldCheck },
-      { to: "/admin/content", label: "Content", icon: FileText },
-    ] : []),
+    ...(isAdmin
+      ? [
+          { to: "/admin", label: "Admin", icon: ShieldCheck },
+          { to: "/admin/content", label: "Content", icon: FileText },
+        ]
+      : []),
   ] as const;
 
   return (
@@ -50,7 +59,9 @@ function AuthedLayout() {
                   key={l.to}
                   to={l.to}
                   className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
-                    active ? "bg-muted font-medium text-foreground" : "text-muted-foreground hover:bg-muted/60"
+                    active
+                      ? "bg-muted font-medium text-foreground"
+                      : "text-muted-foreground hover:bg-muted/60"
                   }`}
                 >
                   <l.icon className="h-4 w-4" /> {l.label}
@@ -61,7 +72,10 @@ function AuthedLayout() {
               variant="ghost"
               size="sm"
               className="mt-4 w-full justify-start gap-2 text-muted-foreground"
-              onClick={async () => { await signOut(); navigate({ to: "/" }); }}
+              onClick={async () => {
+                await signOut();
+                navigate({ to: "/" });
+              }}
             >
               <LogOut className="h-4 w-4" /> Sign out
             </Button>

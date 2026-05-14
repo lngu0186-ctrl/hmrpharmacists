@@ -25,12 +25,27 @@ export const Route = createFileRoute("/_authenticated/profile")({
 });
 
 const LANGUAGE_SUGGESTIONS = [
-  "English", "Mandarin", "Cantonese", "Vietnamese", "Arabic", "Greek", "Italian",
-  "Hindi", "Punjabi", "Tagalog", "Spanish", "Korean", "Auslan",
+  "English",
+  "Mandarin",
+  "Cantonese",
+  "Vietnamese",
+  "Arabic",
+  "Greek",
+  "Italian",
+  "Hindi",
+  "Punjabi",
+  "Tagalog",
+  "Spanish",
+  "Korean",
+  "Auslan",
 ];
 
 const AFFILIATION_SUGGESTIONS = [
-  "AACP", "PSA", "SHPA", "Pharmacy Guild of Australia", "Consultant Pharmacists Australia",
+  "AACP",
+  "PSA",
+  "SHPA",
+  "Pharmacy Guild of Australia",
+  "Consultant Pharmacists Australia",
 ];
 
 type LangItem = { id: string; value: string };
@@ -39,11 +54,19 @@ type AffilItem = { id: string; value: string; meta?: string };
 function ProfilePage() {
   const { user } = useAuth();
 
-  const { data: pharmacist, isLoading, refetch } = useQuery({
+  const {
+    data: pharmacist,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["profile-pharmacist", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase.from("pharmacists").select("*").eq("user_id", user!.id).maybeSingle();
+      const { data } = await supabase
+        .from("pharmacists")
+        .select("*")
+        .eq("user_id", user!.id)
+        .maybeSingle();
       return data;
     },
   });
@@ -85,7 +108,13 @@ function ProfilePage() {
   }, [rawLanguages]);
 
   useEffect(() => {
-    setAffiliations(rawAffiliations.map((r: any) => ({ id: r.id, value: r.organisation, meta: r.role ?? undefined })));
+    setAffiliations(
+      rawAffiliations.map((r: any) => ({
+        id: r.id,
+        value: r.organisation,
+        meta: r.role ?? undefined,
+      })),
+    );
   }, [rawAffiliations]);
 
   useEffect(() => {
@@ -108,9 +137,12 @@ function ProfilePage() {
       <Card className="p-8">
         <h1 className="text-2xl font-semibold tracking-tight">No profile yet</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          You haven't created your pharmacist profile. Complete onboarding first to access profile management.
+          You haven't created your pharmacist profile. Complete onboarding first to access profile
+          management.
         </p>
-        <Button asChild className="mt-6"><Link to="/onboarding">Start onboarding</Link></Button>
+        <Button asChild className="mt-6">
+          <Link to="/onboarding">Start onboarding</Link>
+        </Button>
       </Card>
     );
   }
@@ -140,7 +172,10 @@ function ProfilePage() {
     }
     setTogglingPublish(true);
     try {
-      const { error } = await supabase.from("pharmacists").update({ is_published: next }).eq("id", pharmacist.id);
+      const { error } = await supabase
+        .from("pharmacists")
+        .update({ is_published: next })
+        .eq("id", pharmacist.id);
       if (error) throw error;
       setIsPublished(next);
       toast.success(next ? "Profile is now public" : "Profile hidden from search");
@@ -157,7 +192,9 @@ function ProfilePage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">My profile</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Manage how you appear in the directory.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Manage how you appear in the directory.
+          </p>
         </div>
         {verified && pharmacist.slug && (
           <Button asChild variant="outline" size="sm">
@@ -173,18 +210,22 @@ function ProfilePage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-semibold">Profile completion</h2>
-            <p className="text-xs text-muted-foreground">{completedCount} of {requiredFields.length} required items complete.</p>
+            <p className="text-xs text-muted-foreground">
+              {completedCount} of {requiredFields.length} required items complete.
+            </p>
           </div>
           <div className="text-2xl font-semibold tabular-nums">{completion}%</div>
         </div>
         <Progress value={completion} className="mt-3 h-1.5" />
         {completion < 100 && (
           <ul className="mt-4 grid gap-1.5 sm:grid-cols-2">
-            {requiredFields.filter(([, v]) => !v).map(([label]) => (
-              <li key={label} className="flex items-center gap-2 text-xs text-muted-foreground">
-                <AlertCircle className="h-3.5 w-3.5 text-amber-500" /> {label}
-              </li>
-            ))}
+            {requiredFields
+              .filter(([, v]) => !v)
+              .map(([label]) => (
+                <li key={label} className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <AlertCircle className="h-3.5 w-3.5 text-amber-500" /> {label}
+                </li>
+              ))}
           </ul>
         )}
       </Card>
@@ -193,7 +234,11 @@ function ProfilePage() {
       <Card className="p-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            {isPublished ? <Eye className="mt-0.5 h-5 w-5 text-success" /> : <EyeOff className="mt-0.5 h-5 w-5 text-muted-foreground" />}
+            {isPublished ? (
+              <Eye className="mt-0.5 h-5 w-5 text-success" />
+            ) : (
+              <EyeOff className="mt-0.5 h-5 w-5 text-muted-foreground" />
+            )}
             <div>
               <h2 className="text-sm font-semibold">Public visibility</h2>
               <p className="mt-0.5 text-xs text-muted-foreground">
@@ -207,7 +252,11 @@ function ProfilePage() {
           </div>
           <div className="flex items-center gap-3">
             <Badge variant={verified ? "secondary" : "outline"} className="capitalize">
-              {verified ? <CheckCircle2 className="mr-1 h-3 w-3" /> : <AlertCircle className="mr-1 h-3 w-3" />}
+              {verified ? (
+                <CheckCircle2 className="mr-1 h-3 w-3" />
+              ) : (
+                <AlertCircle className="mr-1 h-3 w-3" />
+              )}
               {pharmacist.verification_status}
             </Badge>
             <Switch
@@ -223,7 +272,9 @@ function ProfilePage() {
       {/* Photo */}
       <Card className="p-6">
         <h2 className="text-sm font-semibold">Profile photo</h2>
-        <p className="mt-0.5 text-xs text-muted-foreground">A clear headshot helps GPs and pharmacies recognise you.</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          A clear headshot helps GPs and pharmacies recognise you.
+        </p>
         <Separator className="my-4" />
         <PhotoUploader
           userId={user!.id}
@@ -243,7 +294,10 @@ function ProfilePage() {
           valueColumn="language"
           suggestions={LANGUAGE_SUGGESTIONS}
           items={languages}
-          onChange={(next) => { setLanguages(next); refetchLanguages(); }}
+          onChange={(next) => {
+            setLanguages(next);
+            refetchLanguages();
+          }}
         />
       </Card>
 
@@ -259,7 +313,10 @@ function ProfilePage() {
           metaLabel="Role (optional)"
           suggestions={AFFILIATION_SUGGESTIONS}
           items={affiliations}
-          onChange={(next) => { setAffiliations(next); refetchAffiliations(); }}
+          onChange={(next) => {
+            setAffiliations(next);
+            refetchAffiliations();
+          }}
         />
       </Card>
 
@@ -267,9 +324,13 @@ function ProfilePage() {
       <Card className="flex flex-wrap items-center justify-between gap-3 p-5">
         <div>
           <h2 className="text-sm font-semibold">Bio, services & service area</h2>
-          <p className="text-xs text-muted-foreground">Edit your written profile, specialties, location and availability.</p>
+          <p className="text-xs text-muted-foreground">
+            Edit your written profile, specialties, location and availability.
+          </p>
         </div>
-        <Button asChild size="sm" variant="outline"><Link to="/onboarding">Edit details</Link></Button>
+        <Button asChild size="sm" variant="outline">
+          <Link to="/onboarding">Edit details</Link>
+        </Button>
       </Card>
     </div>
   );

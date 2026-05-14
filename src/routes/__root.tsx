@@ -84,8 +84,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "HMR Pharmacist Exchange" },
       { name: "twitter:title", content: "HMR Pharmacists Exchange" },
       { name: "twitter:description", content: "Connect with HMR Pharmacists Australia Wide" },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/fLdZzKgBiBhXYWmxgqh2yIovyGz1/social-images/social-1778661501767-Pharmacist_reviewing_medication_…_202605131830.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/fLdZzKgBiBhXYWmxgqh2yIovyGz1/social-images/social-1778661501767-Pharmacist_reviewing_medication_…_202605131830.webp" },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/fLdZzKgBiBhXYWmxgqh2yIovyGz1/social-images/social-1778661501767-Pharmacist_reviewing_medication_…_202605131830.webp",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/fLdZzKgBiBhXYWmxgqh2yIovyGz1/social-images/social-1778661501767-Pharmacist_reviewing_medication_…_202605131830.webp",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -93,17 +101,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/logo.jpg" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap",
+      },
     ],
-    scripts: [{
-      type: "application/ld+json",
-      children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        name: "HMR Pharmacist Exchange",
-        description: "The trusted referral and discovery platform for credentialed pharmacists providing Home Medicines Reviews in Australia.",
-      }),
-    }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "HMR Pharmacist Exchange",
+          description:
+            "The trusted referral and discovery platform for credentialed pharmacists providing Home Medicines Reviews in Australia.",
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,

@@ -20,7 +20,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight" aria-label="HMR Pharmacists Exchange — home">
+        <Link
+          to="/"
+          className="flex items-center gap-2 font-semibold tracking-tight"
+          aria-label="HMR Pharmacists Exchange — home"
+        >
           <img src={logo} alt="HMR Pharmacists Exchange" className="h-11 w-auto" />
           <span className="sr-only">HMR Pharmacists Exchange</span>
         </Link>
@@ -40,12 +44,21 @@ export function Header() {
           {user ? (
             <>
               <NotificationBell />
-              <Button asChild size="sm" variant="outline"><Link to="/dashboard"><LayoutDashboard className="mr-1.5 h-4 w-4" />Dashboard</Link></Button>
+              <Button asChild size="sm" variant="outline">
+                <Link to="/dashboard">
+                  <LayoutDashboard className="mr-1.5 h-4 w-4" />
+                  Dashboard
+                </Link>
+              </Button>
             </>
           ) : (
             <>
-              <Button asChild variant="ghost" size="sm"><Link to="/auth">Sign in</Link></Button>
-              <Button asChild size="sm"><Link to="/auth">Join as pharmacist</Link></Button>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/auth">Sign in</Link>
+              </Button>
+              <Button asChild size="sm">
+                <Link to="/auth">Join as pharmacist</Link>
+              </Button>
             </>
           )}
         </div>
@@ -57,12 +70,24 @@ export function Header() {
         <div className="border-t border-border bg-background lg:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-1 p-4">
             {nav.map((n) => (
-              <Link key={n.to} to={n.to} className="rounded-md px-3 py-2 text-sm hover:bg-muted" onClick={() => setOpen(false)}>
+              <Link
+                key={n.to}
+                to={n.to}
+                className="rounded-md px-3 py-2 text-sm hover:bg-muted"
+                onClick={() => setOpen(false)}
+              >
                 {n.label}
               </Link>
             ))}
-            <Link to="/auth" className="rounded-md px-3 py-2 text-sm hover:bg-muted">Sign in</Link>
-            <Link to="/for-pharmacists" className="rounded-md bg-primary px-3 py-2 text-center text-sm text-primary-foreground">Join as pharmacist</Link>
+            <Link to="/auth" className="rounded-md px-3 py-2 text-sm hover:bg-muted">
+              Sign in
+            </Link>
+            <Link
+              to="/for-pharmacists"
+              className="rounded-md bg-primary px-3 py-2 text-center text-sm text-primary-foreground"
+            >
+              Join as pharmacist
+            </Link>
           </div>
         </div>
       )}

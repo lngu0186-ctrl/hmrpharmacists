@@ -8,15 +8,15 @@ Built on **TanStack Start** (React 19 + Vite 7) with **Lovable Cloud** (Supabase
 
 ## Stack
 
-| Layer | Tech |
-|---|---|
-| UI | React 19, TanStack Router (file-based), Tailwind v4, shadcn/ui, Lucide |
-| Server | TanStack Start server functions (`createServerFn`), server routes (`/api/*`, `/sitemap.xml`) |
-| Data | Supabase Postgres, Row-Level Security |
-| Auth | Supabase Auth (email/password + Google) |
-| Storage | Supabase Storage (`pharmacist-photos` bucket) |
-| Email | Resend via Lovable AI Gateway |
-| Hosting | Cloudflare Workers (via Lovable publish) |
+| Layer   | Tech                                                                                         |
+| ------- | -------------------------------------------------------------------------------------------- |
+| UI      | React 19, TanStack Router (file-based), Tailwind v4, shadcn/ui, Lucide                       |
+| Server  | TanStack Start server functions (`createServerFn`), server routes (`/api/*`, `/sitemap.xml`) |
+| Data    | Supabase Postgres, Row-Level Security                                                        |
+| Auth    | Supabase Auth (email/password + Google)                                                      |
+| Storage | Supabase Storage (`pharmacist-photos` bucket)                                                |
+| Email   | Resend via Lovable AI Gateway                                                                |
+| Hosting | Cloudflare Workers (via Lovable publish)                                                     |
 
 ---
 
@@ -39,11 +39,13 @@ The dev server is wired through `@lovable.dev/vite-tanstack-config`. Do not edit
 Two sets — never mix them.
 
 ### Browser (`import.meta.env.VITE_*`, safe to bundle)
+
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_PUBLISHABLE_KEY`
 - `VITE_SUPABASE_PROJECT_ID`
 
 ### Server (`process.env.*`, server-only)
+
 - `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - `LOVABLE_API_KEY` — used to authenticate against the Lovable connector gateway
 - `RESEND_API_KEY` — managed via Lovable Cloud → Connectors → Resend
@@ -68,6 +70,7 @@ All secrets are managed in **Lovable Cloud → Settings → Secrets**.
 ## Architecture
 
 ### Routes (`src/routes/`)
+
 - `__root.tsx` — sitewide head, providers, error/notFound boundaries
 - `index.tsx` — landing page
 - `find.tsx` — directory search (suburb radius, specialty, telehealth filters)
@@ -81,6 +84,7 @@ All secrets are managed in **Lovable Cloud → Settings → Secrets**.
 - `sitemap[.]xml.ts` — server-generated sitemap with absolute URLs
 
 ### Server functions (`src/lib/*.functions.ts`)
+
 - `email.functions.ts`
   - `sendEnquiryEmails` — public, idempotent per `enquiry_id`, only fires for enquiries < 10 min old
   - `sendVerificationEmail` — admin-only (`requireSupabaseAuth` + `user_roles` check)
@@ -89,6 +93,7 @@ All secrets are managed in **Lovable Cloud → Settings → Secrets**.
 `createServerFn` is the canonical server layer. **Do not add Supabase Edge Functions** for app-internal logic.
 
 ### Auth middleware
+
 - `attachSupabaseAuth` (client middleware, registered globally in `src/start.ts`) attaches the user's bearer token to every server-function RPC.
 - `requireSupabaseAuth` (server middleware) validates the token and provides `{ supabase, userId, claims }` in handler context.
 
@@ -97,6 +102,7 @@ All secrets are managed in **Lovable Cloud → Settings → Secrets**.
 ## Database
 
 ### Key tables
+
 - `pharmacists` — profile rows. Public reads via the `Public can view approved pharmacists` policy (verified + published only). Sensitive columns (`ahpra_number`, `credentialing_body`, `contact_preference`) are revoked from `anon` and `authenticated` roles via column-level GRANT. Owner can update everything except `verification_status` / `is_published` (enforced by `guard_pharmacist_admin_fields` trigger).
 - `pharmacist_specialties`, `pharmacist_languages`, `pharmacist_service_areas`, `pharmacist_affiliations` — child tables, public-readable for verified+published parents.
 - `enquiries` — anonymous insert with `consent_given = true` required. Owner pharmacist can read/update.
@@ -108,6 +114,7 @@ All secrets are managed in **Lovable Cloud → Settings → Secrets**.
 - `user_roles` — separate from `profiles` to prevent privilege escalation. Roles checked via `has_role(uid, 'admin')` SECURITY DEFINER function.
 
 ### RLS philosophy
+
 - Anonymous: read public (verified+published) directory data, submit consent-checked enquiries.
 - Authenticated pharmacist: full CRUD on own profile + child tables; cannot self-verify.
 - Admin: full access via `has_role()` checks in policies.
@@ -118,6 +125,7 @@ All secrets are managed in **Lovable Cloud → Settings → Secrets**.
 ## Storage
 
 Bucket `pharmacist-photos` (public read for direct URLs only):
+
 - INSERT/UPDATE/DELETE restricted to file owner (`storage.foldername(name)[1] = auth.uid()::text`).
 - Listing is not exposed by the app.
 
@@ -156,22 +164,22 @@ See `mem://security/index.md` (security memory) for the full threat model. Highl
 
 ## Production-readiness checklist
 
-| Area | Status | Notes |
-|---|---|---|
-| RLS on every public table | ✅ | Audited; sensitive cols revoked from anon/authenticated |
-| Service-role only for system writes | ✅ | notifications, audit, consent, email_log |
-| Pharmacist self-verification blocked | ✅ | DB trigger |
-| Admin server-fn auth | ✅ | `sendVerificationEmail` |
-| Public server-fn rate/replay protection | ✅ | `sendEnquiryEmails` idempotent + 10-min window |
-| Markdown XSS safe | ✅ | href scheme validation |
-| Auth middleware wired | ✅ | `attachSupabaseAuth` in `start.ts` |
-| Sitemap absolute URLs | ✅ | + dynamic pharmacists |
-| `robots.txt` blocks private routes | ✅ | dashboard/admin/auth disallowed |
-| Hero image optimised (WebP/AVIF + responsive srcset) | ⚠️ | follow-up: convert hero.jpg |
-| Lazy-load Recharts in admin | ⚠️ | follow-up |
-| Vitest + RTL setup | ⚠️ | follow-up — see "Testing" below |
-| GitHub Actions CI (lint/build) | ⚠️ | follow-up — see "CI" below |
-| Lint clean | ⚠️ | config is pragmatic; mostly `any` warnings remain |
+| Area                                                 | Status | Notes                                                   |
+| ---------------------------------------------------- | ------ | ------------------------------------------------------- |
+| RLS on every public table                            | ✅     | Audited; sensitive cols revoked from anon/authenticated |
+| Service-role only for system writes                  | ✅     | notifications, audit, consent, email_log                |
+| Pharmacist self-verification blocked                 | ✅     | DB trigger                                              |
+| Admin server-fn auth                                 | ✅     | `sendVerificationEmail`                                 |
+| Public server-fn rate/replay protection              | ✅     | `sendEnquiryEmails` idempotent + 10-min window          |
+| Markdown XSS safe                                    | ✅     | href scheme validation                                  |
+| Auth middleware wired                                | ✅     | `attachSupabaseAuth` in `start.ts`                      |
+| Sitemap absolute URLs                                | ✅     | + dynamic pharmacists                                   |
+| `robots.txt` blocks private routes                   | ✅     | dashboard/admin/auth disallowed                         |
+| Hero image optimised (WebP/AVIF + responsive srcset) | ⚠️     | follow-up: convert hero.jpg                             |
+| Lazy-load Recharts in admin                          | ⚠️     | follow-up                                               |
+| Vitest + RTL setup                                   | ⚠️     | follow-up — see "Testing" below                         |
+| GitHub Actions CI (lint/build)                       | ⚠️     | follow-up — see "CI" below                              |
+| Lint clean                                           | ⚠️     | config is pragmatic; mostly `any` warnings remain       |
 
 ---
 
@@ -184,12 +192,14 @@ bun add -d vitest @testing-library/react @testing-library/jest-dom jsdom @vitejs
 ```
 
 Add to `package.json`:
+
 ```json
 "test": "vitest run",
 "test:watch": "vitest"
 ```
 
 Suggested coverage:
+
 - `src/lib/markdown.test.ts` — `safeHref` blocks `javascript:`
 - `src/lib/email.functions.test.ts` — admin role check rejects non-admin
 - Smoke render tests for `/`, `/find`, `/auth`
@@ -197,6 +207,7 @@ Suggested coverage:
 ## Follow-up: CI
 
 `.github/workflows/ci.yml` (run on push + PR):
+
 ```yaml
 name: CI
 on: [push, pull_request]
@@ -209,7 +220,7 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run lint
       - run: bun run build
-      - run: bun run test  # once vitest is added
+      - run: bun run test # once vitest is added
 ```
 
 ---
