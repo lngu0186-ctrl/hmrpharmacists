@@ -182,8 +182,32 @@ function AdminPage() {
         </TabsContent>
 
         <TabsContent value="emails">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <div className="flex gap-1">
+              {(["all", "sent", "failed"] as const).map((s) => (
+                <Button
+                  key={s}
+                  size="sm"
+                  variant={emailStatusFilter === s ? "default" : "outline"}
+                  onClick={() => { setEmailStatusFilter(s); setEmailPage(0); }}
+                  className="capitalize h-7 px-3 text-xs"
+                >
+                  {s}
+                </Button>
+              ))}
+            </div>
+            <span className="ml-auto text-xs text-muted-foreground">
+              {emailLogTotal === 0
+                ? "0 results"
+                : `${emailPage * PAGE_SIZE + 1}–${Math.min((emailPage + 1) * PAGE_SIZE, emailLogTotal)} of ${emailLogTotal}`}
+            </span>
+            <div className="flex gap-1">
+              <Button size="sm" variant="outline" disabled={emailPage === 0} onClick={() => setEmailPage((p) => Math.max(0, p - 1))} className="h-7 px-3 text-xs">Prev</Button>
+              <Button size="sm" variant="outline" disabled={emailPage >= emailLogPages - 1} onClick={() => setEmailPage((p) => p + 1)} className="h-7 px-3 text-xs">Next</Button>
+            </div>
+          </div>
           <Card className="divide-y divide-border">
-            {emailLog.length === 0 && <p className="p-8 text-center text-sm text-muted-foreground">No emails sent yet.</p>}
+            {emailLog.length === 0 && <p className="p-8 text-center text-sm text-muted-foreground">No emails to show.</p>}
             {emailLog.map((row: any) => (
               <div key={row.id} className="grid gap-1 p-4 text-sm">
                 <div className="flex flex-wrap items-center gap-2">
