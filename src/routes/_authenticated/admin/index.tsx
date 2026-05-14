@@ -111,32 +111,7 @@ function AdminPage() {
         <KPI label="Enquiries" value={stats.enquiriesTotal} icon={<Inbox className="h-4 w-4 text-primary" />} />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="p-5">
-          <h3 className="mb-4 text-sm font-medium">Verification status</h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <PieChart>
-              <Pie data={stats.statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80}>
-                {stats.statusData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </Card>
-        <Card className="p-5">
-          <h3 className="mb-4 text-sm font-medium">Coverage by state</h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={stats.stateData}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-              <XAxis dataKey="state" stroke="var(--muted-foreground)" fontSize={12} />
-              <YAxis stroke="var(--muted-foreground)" fontSize={12} />
-              <Tooltip />
-              <Bar dataKey="count" fill="var(--primary)" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-      </div>
+      <AdminCharts statusData={stats.statusData} stateData={stats.stateData} />
 
       <Tabs defaultValue="queue">
         <TabsList>
