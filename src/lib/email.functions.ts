@@ -184,7 +184,10 @@ export const sendEnquiryEmails = createServerFn({ method: "POST" })
         `,
       );
       try {
-        await resendSend(ph.email, `New HMR enquiry from ${enq.sender_name}`, html, enq.sender_email);
+        await resendSend(ph.email, `New HMR enquiry from ${enq.sender_name}`, html, enq.sender_email, {
+          template_name: "enquiry.pharmacist_notification",
+          metadata: { enquiry_id: enq.id, pharmacist_id: enq.pharmacist_id },
+        });
       } catch (e) {
         console.error("[email] pharmacist notify failed", e);
       }
