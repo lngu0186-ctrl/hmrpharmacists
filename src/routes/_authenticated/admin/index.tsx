@@ -61,6 +61,9 @@ function AdminPage() {
     const { error } = await supabase.from("pharmacists").update(update).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Updated");
+    sendVerification({ data: { pharmacist_id: id, status } })
+      .then((r: any) => { if (r?.ok) toast.success("Notification email sent"); })
+      .catch((e) => console.error("verification email failed", e));
     qc.invalidateQueries({ queryKey: ["admin-pharmacists"] });
   };
 
