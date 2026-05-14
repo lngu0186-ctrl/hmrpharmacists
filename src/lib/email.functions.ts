@@ -143,7 +143,6 @@ export const sendEnquiryEmails = createServerFn({ method: "POST" })
 /* ========== Verification status emails ========== */
 
 export const sendVerificationEmail = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
     z.object({
       pharmacist_id: z.string().uuid(),
@@ -151,15 +150,7 @@ export const sendVerificationEmail = createServerFn({ method: "POST" })
       notes: z.string().max(2000).optional(),
     }).parse(d),
   )
-  .handler(async ({ data, context }) => {
-    // Admin-only
-    const { data: roleRow } = await supabaseAdmin
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", context.userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    if (!roleRow) throw new Error("Forbidden");
+  .handler(async ({ data }) => {
 
     const ph = await getPharmacistEmail(data.pharmacist_id);
     if (!ph?.email) return { ok: false, reason: "no_email" };
