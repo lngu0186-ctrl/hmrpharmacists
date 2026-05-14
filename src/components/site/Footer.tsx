@@ -69,8 +69,7 @@ export function Footer() {
         </div>
 
         <p className="mt-8 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} HMR Pharmacist Exchange. Australian spelling. Made for
-          Australian healthcare.
+          © {new Date().getFullYear()} HMR Pharmacists Exchange.
         </p>
       </div>
     </footer>
