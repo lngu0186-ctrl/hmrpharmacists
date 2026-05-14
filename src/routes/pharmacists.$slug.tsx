@@ -316,16 +316,22 @@ function EnquiryForm({ pharmacistId }: { pharmacistId: string }) {
           message: parsed.data.message,
           consent_given: true,
         })
-        .select("id")
+        .select("id, reference_code")
         .single();
       if (error) throw error;
       // Fire-and-forget email notifications
       sendEmails({ data: { enquiry_id: data.id } }).catch((e) =>
         console.error("email dispatch failed", e),
       );
+      return data;
     },
-    onSuccess: () => {
-      toast.success("Enquiry sent. The pharmacist will respond via the platform.");
+    onSuccess: (data) => {
+      toast.success(
+        data?.reference_code
+          ? `Enquiry sent. Your reference: ${data.reference_code}`
+          : "Enquiry sent. The pharmacist will respond via the platform.",
+        { duration: 8000 },
+      );
       setForm({
         sender_type: "gp",
         sender_name: "",
