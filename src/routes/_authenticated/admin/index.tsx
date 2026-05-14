@@ -142,7 +142,7 @@ function AdminPage() {
           <TabsTrigger value="queue">Verification queue ({stats.pending})</TabsTrigger>
           <TabsTrigger value="all">All pharmacists ({stats.total})</TabsTrigger>
           <TabsTrigger value="enquiries">Enquiries ({stats.enquiriesTotal})</TabsTrigger>
-          <TabsTrigger value="emails">Email log ({emailLog.length})</TabsTrigger>
+          <TabsTrigger value="emails">Email log ({emailLogTotal})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="queue">
