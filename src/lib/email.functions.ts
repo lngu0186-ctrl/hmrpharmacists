@@ -207,7 +207,10 @@ export const sendEnquiryEmails = createServerFn({ method: "POST" })
       `,
     );
     try {
-      await resendSend(enq.sender_email, "Your HMR enquiry has been sent", senderHtml);
+      await resendSend(enq.sender_email, "Your HMR enquiry has been sent", senderHtml, undefined, {
+        template_name: "enquiry.sender_confirmation",
+        metadata: { enquiry_id: enq.id },
+      });
     } catch (e) {
       console.error("[email] sender confirm failed", e);
     }
