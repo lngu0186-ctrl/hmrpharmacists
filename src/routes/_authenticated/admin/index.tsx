@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { sendVerificationEmail } from "@/lib/email.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminPage,
@@ -19,6 +21,7 @@ const COLORS = ["var(--primary)", "var(--accent)", "var(--destructive)", "var(--
 
 function AdminPage() {
   const qc = useQueryClient();
+  const sendVerification = useServerFn(sendVerificationEmail);
 
   const { data: pharmacists = [] } = useQuery({
     queryKey: ["admin-pharmacists"],
@@ -58,6 +61,9 @@ function AdminPage() {
     const { error } = await supabase.from("pharmacists").update(update).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Updated");
+    sendVerification({ data: { pharmacist_id: id, status } })
+      .then((r: any) => { if (r?.ok) toast.success("Notification email sent"); })
+      .catch((e) => console.error("verification email failed", e));
     qc.invalidateQueries({ queryKey: ["admin-pharmacists"] });
   };
 

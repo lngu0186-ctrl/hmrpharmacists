@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { sendEnquiryEmails } from "@/lib/email.functions";
 
 export const Route = createFileRoute("/pharmacists/$slug")({
   component: ProfilePage,
@@ -177,6 +179,7 @@ const enquirySchema = z.object({
 });
 
 function EnquiryForm({ pharmacistId }: { pharmacistId: string }) {
+  const sendEmails = useServerFn(sendEnquiryEmails);
   const [form, setForm] = useState({
     sender_type: "gp" as const,
     sender_name: "",
@@ -192,7 +195,7 @@ function EnquiryForm({ pharmacistId }: { pharmacistId: string }) {
     mutationFn: async (values: typeof form) => {
       const parsed = enquirySchema.safeParse(values);
       if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Invalid input");
-      const { error } = await supabase.from("enquiries").insert({
+      const { data, error } = await supabase.from("enquiries").insert({
         pharmacist_id: pharmacistId,
         sender_type: parsed.data.sender_type,
         sender_name: parsed.data.sender_name,
@@ -202,8 +205,10 @@ function EnquiryForm({ pharmacistId }: { pharmacistId: string }) {
         patient_suburb: parsed.data.patient_suburb || null,
         message: parsed.data.message,
         consent_given: true,
-      });
+      }).select("id").single();
       if (error) throw error;
+      // Fire-and-forget email notifications
+      sendEmails({ data: { enquiry_id: data.id } }).catch((e) => console.error("email dispatch failed", e));
     },
     onSuccess: () => {
       toast.success("Enquiry sent. The pharmacist will respond via the platform.");
