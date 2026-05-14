@@ -341,6 +341,113 @@ function AdminPage() {
             ))}
           </Card>
         </TabsContent>
+
+        <TabsContent value="users">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <Input
+              placeholder="Search by email, name, or ID…"
+              value={userSearch}
+              onChange={(e) => {
+                setUserSearch(e.target.value);
+                setUserPage(1);
+              }}
+              className="max-w-sm h-9"
+            />
+            <span className="ml-auto text-xs text-muted-foreground">
+              Page {userPage} · {users.length} shown
+            </span>
+            <div className="flex gap-1">
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={userPage === 1}
+                onClick={() => setUserPage((p) => Math.max(1, p - 1))}
+                className="h-7 px-3 text-xs"
+              >
+                Prev
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={users.length < 50}
+                onClick={() => setUserPage((p) => p + 1)}
+                className="h-7 px-3 text-xs"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+          <Card className="divide-y divide-border">
+            {users.length === 0 && (
+              <p className="p-8 text-center text-sm text-muted-foreground">No users found.</p>
+            )}
+            {users.map((u) => {
+              const isAdmin = u.roles.includes("admin");
+              return (
+                <div
+                  key={u.id}
+                  className="grid gap-3 p-4 sm:grid-cols-[1fr_auto] sm:items-center"
+                >
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium">{u.display_name || u.email || u.id}</span>
+                      {isAdmin && (
+                        <Badge variant="secondary" className="text-[10px]">
+                          Admin
+                        </Badge>
+                      )}
+                      {u.roles
+                        .filter((r) => r !== "admin")
+                        .map((r) => (
+                          <Badge key={r} variant="outline" className="text-[10px] capitalize">
+                            {r}
+                          </Badge>
+                        ))}
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                      {u.email && <span>{u.email}</span>}
+                      <span className="font-mono">{u.id.slice(0, 8)}</span>
+                      <span>
+                        Joined {new Date(u.created_at).toLocaleDateString("en-AU")}
+                      </span>
+                      {u.last_sign_in_at && (
+                        <span>
+                          Last seen{" "}
+                          {new Date(u.last_sign_in_at).toLocaleDateString("en-AU")}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => toggleRole(u.id, isAdmin)}
+                    >
+                      {isAdmin ? (
+                        <>
+                          <ShieldMinus className="mr-1 h-3.5 w-3.5" /> Revoke admin
+                        </>
+                      ) : (
+                        <>
+                          <ShieldPlus className="mr-1 h-3.5 w-3.5" /> Make admin
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => removeUser(u.id, u.email)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="mr-1 h-3.5 w-3.5" /> Delete
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
