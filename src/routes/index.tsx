@@ -117,7 +117,7 @@ function Hero() {
               </span>
               <div>
                 <p className="text-xs text-muted-foreground">Verified by HMR Exchange</p>
-                <p className="text-sm font-semibold">AHPRA-registered, AACP-credentialed</p>
+                <p className="text-sm font-semibold">AHPRA-registered, ACP-credentialed</p>
               </div>
             </div>
           </div>
