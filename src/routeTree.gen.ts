@@ -22,10 +22,12 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutHmrRouteImport } from './routes/about-hmr'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RegisterInviteRouteImport } from './routes/register.invite'
 import { Route as PharmacistsSlugRouteImport } from './routes/pharmacists.$slug'
 import { Route as PagesSlugRouteImport } from './routes/pages.$slug'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedInviteRouteImport } from './routes/_authenticated/invite'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -96,6 +98,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterInviteRoute = RegisterInviteRouteImport.update({
+  id: '/register/invite',
+  path: '/register/invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PharmacistsSlugRoute = PharmacistsSlugRouteImport.update({
   id: '/pharmacists/$slug',
   path: '/pharmacists/$slug',
@@ -114,6 +121,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedInviteRoute = AuthenticatedInviteRouteImport.update({
+  id: '/invite',
+  path: '/invite',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
@@ -159,10 +171,12 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/inbox': typeof AuthenticatedInboxRoute
+  '/invite': typeof AuthenticatedInviteRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/pages/$slug': typeof PagesSlugRoute
   '/pharmacists/$slug': typeof PharmacistsSlugRoute
+  '/register/invite': typeof RegisterInviteRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -181,10 +195,12 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/inbox': typeof AuthenticatedInboxRoute
+  '/invite': typeof AuthenticatedInviteRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/pages/$slug': typeof PagesSlugRoute
   '/pharmacists/$slug': typeof PharmacistsSlugRoute
+  '/register/invite': typeof RegisterInviteRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -206,10 +222,12 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
+  '/_authenticated/invite': typeof AuthenticatedInviteRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/pages/$slug': typeof PagesSlugRoute
   '/pharmacists/$slug': typeof PharmacistsSlugRoute
+  '/register/invite': typeof RegisterInviteRoute
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -231,10 +249,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/inbox'
+    | '/invite'
     | '/onboarding'
     | '/profile'
     | '/pages/$slug'
     | '/pharmacists/$slug'
+    | '/register/invite'
     | '/admin/content'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -253,10 +273,12 @@ export interface FileRouteTypes {
     | '/terms'
     | '/dashboard'
     | '/inbox'
+    | '/invite'
     | '/onboarding'
     | '/profile'
     | '/pages/$slug'
     | '/pharmacists/$slug'
+    | '/register/invite'
     | '/admin/content'
     | '/admin'
   id:
@@ -277,10 +299,12 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
+    | '/_authenticated/invite'
     | '/_authenticated/onboarding'
     | '/_authenticated/profile'
     | '/pages/$slug'
     | '/pharmacists/$slug'
+    | '/register/invite'
     | '/_authenticated/admin/content'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -301,6 +325,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   PagesSlugRoute: typeof PagesSlugRoute
   PharmacistsSlugRoute: typeof PharmacistsSlugRoute
+  RegisterInviteRoute: typeof RegisterInviteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -396,6 +421,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/register/invite': {
+      id: '/register/invite'
+      path: '/register/invite'
+      fullPath: '/register/invite'
+      preLoaderRoute: typeof RegisterInviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pharmacists/$slug': {
       id: '/pharmacists/$slug'
       path: '/pharmacists/$slug'
@@ -422,6 +454,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/invite': {
+      id: '/_authenticated/invite'
+      path: '/invite'
+      fullPath: '/invite'
+      preLoaderRoute: typeof AuthenticatedInviteRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/inbox': {
@@ -479,6 +518,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
+  AuthenticatedInviteRoute: typeof AuthenticatedInviteRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
 }
@@ -487,6 +527,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
+  AuthenticatedInviteRoute: AuthenticatedInviteRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
 }
@@ -511,6 +552,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   PagesSlugRoute: PagesSlugRoute,
   PharmacistsSlugRoute: PharmacistsSlugRoute,
+  RegisterInviteRoute: RegisterInviteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
