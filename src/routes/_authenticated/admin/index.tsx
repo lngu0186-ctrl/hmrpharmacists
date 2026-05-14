@@ -39,6 +39,15 @@ function AdminPage() {
     },
   });
 
+  const { data: emailLog = [] } = useQuery({
+    queryKey: ["admin-email-log"],
+    queryFn: async () => {
+      const { data } = await supabase.from("email_send_log").select("*").order("created_at", { ascending: false }).limit(200);
+      return data ?? [];
+    },
+    refetchInterval: 30_000,
+  });
+
   const stats = useMemo(() => {
     const total = pharmacists.length;
     const verified = pharmacists.filter((p: any) => p.verification_status === "verified").length;
@@ -119,6 +128,7 @@ function AdminPage() {
           <TabsTrigger value="queue">Verification queue ({stats.pending})</TabsTrigger>
           <TabsTrigger value="all">All pharmacists ({stats.total})</TabsTrigger>
           <TabsTrigger value="enquiries">Enquiries ({stats.enquiriesTotal})</TabsTrigger>
+          <TabsTrigger value="emails">Email log ({emailLog.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="queue">
@@ -152,6 +162,31 @@ function AdminPage() {
                   <span className="ml-auto text-[11px] text-muted-foreground">{new Date(e.created_at).toLocaleString("en-AU")}</span>
                 </div>
                 <p className="line-clamp-2 text-muted-foreground">{e.message}</p>
+              </div>
+            ))}
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="emails">
+          <Card className="divide-y divide-border">
+            {emailLog.length === 0 && <p className="p-8 text-center text-sm text-muted-foreground">No emails sent yet.</p>}
+            {emailLog.map((row: any) => (
+              <div key={row.id} className="grid gap-1 p-4 text-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge
+                    variant="outline"
+                    className={`text-[10px] capitalize ${row.status === "sent" ? "border-success/40 text-success" : "border-destructive/40 text-destructive"}`}
+                  >
+                    {row.status}
+                  </Badge>
+                  <span className="font-medium">{row.template_name}</span>
+                  <span className="text-xs text-muted-foreground">→ {row.recipient_email}</span>
+                  <span className="ml-auto text-[11px] text-muted-foreground">{new Date(row.created_at).toLocaleString("en-AU")}</span>
+                </div>
+                {row.subject && <p className="text-xs text-muted-foreground">{row.subject}</p>}
+                {row.error_message && (
+                  <p className="text-xs text-destructive font-mono break-all">{row.error_message}</p>
+                )}
               </div>
             ))}
           </Card>
