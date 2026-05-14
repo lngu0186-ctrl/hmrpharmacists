@@ -39,6 +39,15 @@ function AdminPage() {
     },
   });
 
+  const { data: emailLog = [] } = useQuery({
+    queryKey: ["admin-email-log"],
+    queryFn: async () => {
+      const { data } = await supabase.from("email_send_log").select("*").order("created_at", { ascending: false }).limit(200);
+      return data ?? [];
+    },
+    refetchInterval: 30_000,
+  });
+
   const stats = useMemo(() => {
     const total = pharmacists.length;
     const verified = pharmacists.filter((p: any) => p.verification_status === "verified").length;
