@@ -322,6 +322,87 @@ export type Database = {
           },
         ]
       }
+      pharmacist_invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_user_id: string | null
+          created_at: string
+          expires_at: string
+          fast_track_verification: boolean
+          id: string
+          invited_accreditation_number: string | null
+          invited_ahpra_number: string | null
+          invited_by: string
+          invited_by_role: string
+          invited_email: string
+          invited_first_name: string | null
+          invited_last_name: string | null
+          invited_mobile: string | null
+          invited_postcode: string | null
+          invited_state: string | null
+          invited_suburb: string | null
+          last_sent_at: string
+          personal_note: string | null
+          revoked_at: string | null
+          send_count: number
+          status: Database["public"]["Enums"]["invitation_status"]
+          token_hash: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_user_id?: string | null
+          created_at?: string
+          expires_at: string
+          fast_track_verification?: boolean
+          id?: string
+          invited_accreditation_number?: string | null
+          invited_ahpra_number?: string | null
+          invited_by: string
+          invited_by_role: string
+          invited_email: string
+          invited_first_name?: string | null
+          invited_last_name?: string | null
+          invited_mobile?: string | null
+          invited_postcode?: string | null
+          invited_state?: string | null
+          invited_suburb?: string | null
+          last_sent_at?: string
+          personal_note?: string | null
+          revoked_at?: string | null
+          send_count?: number
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token_hash: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_user_id?: string | null
+          created_at?: string
+          expires_at?: string
+          fast_track_verification?: boolean
+          id?: string
+          invited_accreditation_number?: string | null
+          invited_ahpra_number?: string | null
+          invited_by?: string
+          invited_by_role?: string
+          invited_email?: string
+          invited_first_name?: string | null
+          invited_last_name?: string | null
+          invited_mobile?: string | null
+          invited_postcode?: string | null
+          invited_state?: string | null
+          invited_suburb?: string | null
+          last_sent_at?: string
+          personal_note?: string | null
+          revoked_at?: string | null
+          send_count?: number
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token_hash?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pharmacist_languages: {
         Row: {
           created_at: string
@@ -601,6 +682,7 @@ export type Database = {
         Args: { _pharmacist_id: string; _user_id: string }
         Returns: boolean
       }
+      is_verified_pharmacist: { Args: { _user_id: string }; Returns: boolean }
       pharmacist_is_public: {
         Args: { _pharmacist_id: string }
         Returns: boolean
@@ -616,6 +698,7 @@ export type Database = {
         | "closed"
         | "accepted"
         | "declined"
+      invitation_status: "pending" | "accepted" | "expired" | "revoked"
       verification_status:
         | "pending"
         | "verified"
@@ -759,6 +842,7 @@ export const Constants = {
         "accepted",
         "declined",
       ],
+      invitation_status: ["pending", "accepted", "expired", "revoked"],
       verification_status: [
         "pending",
         "verified",
