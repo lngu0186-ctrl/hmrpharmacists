@@ -24,9 +24,11 @@ async function logAudit(
     action,
     target_table: "user_roles",
     target_id: targetId,
-    metadata,
+    metadata: metadata as never,
   });
 }
+
+type AppRole = "admin" | "pharmacist" | "user";
 
 export const listUsers = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
