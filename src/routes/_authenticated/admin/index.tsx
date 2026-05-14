@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { CheckCircle2, XCircle, Eye, EyeOff, Users, ShieldCheck, Inbox, MapPin } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, PieChart, Pie, Cell, Legend } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { sendVerificationEmail } from "@/lib/email.functions";
+import { setPharmacistStatus, togglePharmacistPublish } from "@/lib/admin.functions";
+import { AdminCharts } from "./AdminCharts";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminPage,
