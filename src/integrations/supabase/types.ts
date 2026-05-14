@@ -164,6 +164,7 @@ export type Database = {
           sender_name: string
           sender_phone: string | null
           sender_type: Database["public"]["Enums"]["enquiry_sender_type"]
+          sender_user_id: string | null
           status: Database["public"]["Enums"]["enquiry_status"]
           status_updated_at: string | null
           updated_at: string
@@ -183,6 +184,7 @@ export type Database = {
           sender_name: string
           sender_phone?: string | null
           sender_type: Database["public"]["Enums"]["enquiry_sender_type"]
+          sender_user_id?: string | null
           status?: Database["public"]["Enums"]["enquiry_status"]
           status_updated_at?: string | null
           updated_at?: string
@@ -202,6 +204,7 @@ export type Database = {
           sender_name?: string
           sender_phone?: string | null
           sender_type?: Database["public"]["Enums"]["enquiry_sender_type"]
+          sender_user_id?: string | null
           status?: Database["public"]["Enums"]["enquiry_status"]
           status_updated_at?: string | null
           updated_at?: string
