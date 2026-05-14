@@ -26,7 +26,9 @@ export const setPharmacistStatus = createServerFn({ method: "POST" })
     if (!(await isAdmin(context.userId))) {
       throw new Response("Forbidden", { status: 403 });
     }
-    const update: Record<string, unknown> = { verification_status: data.status };
+    const update: { verification_status: "verified" | "rejected" | "pending"; is_published?: boolean } = {
+      verification_status: data.status,
+    };
     if (data.publish !== undefined) update.is_published = data.publish;
     const { error } = await supabaseAdmin
       .from("pharmacists")
