@@ -56,7 +56,7 @@ async function logEmail(entry: {
       subject: entry.subject,
       status: entry.status,
       error_message: entry.error_message ?? null,
-      metadata: entry.metadata ?? null,
+      metadata: (entry.metadata ?? null) as never,
       message_id: entry.message_id ?? null,
     });
   } catch (e) {
