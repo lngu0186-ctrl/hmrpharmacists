@@ -13,7 +13,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — HMR Pharmacist Exchange" },
-      { name: "description", content: "Sign in or create your account on HMR Pharmacist Exchange." },
+      {
+        name: "description",
+        content: "Sign in or create your account on HMR Pharmacist Exchange.",
+      },
       { property: "og:url", content: "/auth" },
       { name: "robots", content: "noindex" },
     ],
@@ -41,7 +44,8 @@ function AuthPage() {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signUp({
-      email, password,
+      email,
+      password,
       options: { emailRedirectTo: `${window.location.origin}/`, data: { display_name: name } },
     });
     setLoading(false);
@@ -54,7 +58,9 @@ function AuthPage() {
       <section className="mx-auto max-w-md px-4 py-16 sm:px-6 lg:px-8">
         <div className="rounded-3xl border border-border bg-card p-8 shadow-elevated">
           <h1 className="text-2xl font-semibold">Welcome</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Sign in or create your HMR Pharmacist Exchange account.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Sign in or create your HMR Pharmacist Exchange account.
+          </p>
 
           <Tabs defaultValue="signin" className="mt-6">
             <TabsList className="grid w-full grid-cols-2">
@@ -65,7 +71,9 @@ function AuthPage() {
               <form onSubmit={signIn} className="mt-6 space-y-4">
                 <Field label="Email" type="email" value={email} onChange={setEmail} />
                 <Field label="Password" type="password" value={password} onChange={setPassword} />
-                <Button type="submit" className="w-full" disabled={loading}>{loading ? "Signing in…" : "Sign in"}</Button>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Signing in…" : "Sign in"}
+                </Button>
               </form>
             </TabsContent>
             <TabsContent value="signup">
@@ -73,8 +81,12 @@ function AuthPage() {
                 <Field label="Display name" value={name} onChange={setName} />
                 <Field label="Email" type="email" value={email} onChange={setEmail} />
                 <Field label="Password" type="password" value={password} onChange={setPassword} />
-                <Button type="submit" className="w-full" disabled={loading}>{loading ? "Creating…" : "Create account"}</Button>
-                <p className="text-[11px] text-muted-foreground">By creating an account you agree to our terms and privacy policy.</p>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Creating…" : "Create account"}
+                </Button>
+                <p className="text-[11px] text-muted-foreground">
+                  By creating an account you agree to our terms and privacy policy.
+                </p>
               </form>
             </TabsContent>
           </Tabs>
@@ -84,11 +96,27 @@ function AuthPage() {
   );
 }
 
-function Field({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (v: string) => void; type?: string }) {
+function Field({
+  label,
+  value,
+  onChange,
+  type = "text",
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+}) {
   return (
     <div>
       <Label className="text-xs">{label}</Label>
-      <Input type={type} className="mt-1.5" value={value} onChange={(e) => onChange(e.target.value)} required />
+      <Input
+        type={type}
+        className="mt-1.5"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required
+      />
     </div>
   );
 }

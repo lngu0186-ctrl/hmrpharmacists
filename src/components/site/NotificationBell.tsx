@@ -29,18 +29,33 @@ export function NotificationBell() {
     if (!user) return;
     const ch = supabase
       .channel(`notif-${user.id}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` }, () => {
-        qc.invalidateQueries({ queryKey: ["notifications", user.id] });
-      })
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          qc.invalidateQueries({ queryKey: ["notifications", user.id] });
+        },
+      )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [user, qc]);
 
   const unread = items.filter((n: any) => !n.read_at).length;
 
   const markAll = async () => {
     if (!user) return;
-    await supabase.from("notifications").update({ read_at: new Date().toISOString() }).is("read_at", null).eq("user_id", user.id);
+    await supabase
+      .from("notifications")
+      .update({ read_at: new Date().toISOString() })
+      .is("read_at", null)
+      .eq("user_id", user.id);
     qc.invalidateQueries({ queryKey: ["notifications", user?.id] });
   };
 
@@ -49,7 +64,10 @@ export function NotificationBell() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button aria-label="Notifications" className="relative rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground">
+        <button
+          aria-label="Notifications"
+          className="relative rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
           <Bell className="h-5 w-5" />
           {unread > 0 && (
             <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">
@@ -68,7 +86,9 @@ export function NotificationBell() {
           )}
         </div>
         <div className="max-h-96 overflow-y-auto">
-          {items.length === 0 && <p className="p-6 text-center text-xs text-muted-foreground">No notifications yet</p>}
+          {items.length === 0 && (
+            <p className="p-6 text-center text-xs text-muted-foreground">No notifications yet</p>
+          )}
           {items.map((n: any) => (
             <Link
               key={n.id}
@@ -81,7 +101,9 @@ export function NotificationBell() {
                 {!n.read_at && <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />}
               </div>
               {n.body && <p className="mt-0.5 text-xs text-muted-foreground">{n.body}</p>}
-              <p className="mt-1 text-[10px] text-muted-foreground">{new Date(n.created_at).toLocaleString("en-AU")}</p>
+              <p className="mt-1 text-[10px] text-muted-foreground">
+                {new Date(n.created_at).toLocaleString("en-AU")}
+              </p>
             </Link>
           ))}
         </div>

@@ -35,11 +35,15 @@ export function PharmacistCard({ p }: { p: PharmacistCardData }) {
             <h3 className="truncate text-base font-semibold text-foreground">{p.full_name}</h3>
             <VerifiedBadge />
           </div>
-          <p className="mt-0.5 text-sm text-muted-foreground">{p.title ?? "Credentialed Pharmacist"}</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            {p.title ?? "Credentialed Pharmacist"}
+          </p>
           <p className="mt-1 inline-flex items-center gap-1 text-sm text-muted-foreground">
             <MapPin className="h-3.5 w-3.5" /> {p.suburb}, {p.state}
             {typeof p.distance_km === "number" && (
-              <span className="ml-2 rounded-full bg-trust/10 px-2 py-0.5 text-[11px] font-medium text-trust">{p.distance_km.toFixed(1)} km away</span>
+              <span className="ml-2 rounded-full bg-trust/10 px-2 py-0.5 text-[11px] font-medium text-trust">
+                {p.distance_km.toFixed(1)} km away
+              </span>
             )}
           </p>
         </div>
@@ -48,7 +52,12 @@ export function PharmacistCard({ p }: { p: PharmacistCardData }) {
       {p.specialties && p.specialties.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {p.specialties.slice(0, 3).map((s) => (
-            <span key={s} className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary">{s}</span>
+            <span
+              key={s}
+              className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary"
+            >
+              {s}
+            </span>
           ))}
         </div>
       )}
@@ -56,18 +65,36 @@ export function PharmacistCard({ p }: { p: PharmacistCardData }) {
       {p.bio && <p className="line-clamp-2 text-sm text-muted-foreground">{p.bio}</p>}
 
       <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-        {p.telehealth && <span className="inline-flex items-center gap-1"><Video className="h-3.5 w-3.5" /> Telehealth</span>}
-        {p.home_visits && <span className="inline-flex items-center gap-1"><Home className="h-3.5 w-3.5" /> Home visits</span>}
-        {p.turnaround_days && <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> ~{p.turnaround_days} day turnaround</span>}
+        {p.telehealth && (
+          <span className="inline-flex items-center gap-1">
+            <Video className="h-3.5 w-3.5" /> Telehealth
+          </span>
+        )}
+        {p.home_visits && (
+          <span className="inline-flex items-center gap-1">
+            <Home className="h-3.5 w-3.5" /> Home visits
+          </span>
+        )}
+        {p.turnaround_days && (
+          <span className="inline-flex items-center gap-1">
+            <Clock className="h-3.5 w-3.5" /> ~{p.turnaround_days} day turnaround
+          </span>
+        )}
       </div>
 
       <div className="flex items-center justify-between gap-3 pt-2">
-        <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${p.accepting_referrals ? "text-success" : "text-muted-foreground"}`}>
-          <span className={`h-2 w-2 rounded-full ${p.accepting_referrals ? "bg-success" : "bg-muted-foreground"}`} />
+        <span
+          className={`inline-flex items-center gap-1.5 text-xs font-medium ${p.accepting_referrals ? "text-success" : "text-muted-foreground"}`}
+        >
+          <span
+            className={`h-2 w-2 rounded-full ${p.accepting_referrals ? "bg-success" : "bg-muted-foreground"}`}
+          />
           {p.accepting_referrals ? "Accepting new referrals" : "Limited availability"}
         </span>
         <Button asChild size="sm" variant="outline">
-          <Link to="/pharmacists/$slug" params={{ slug: p.slug }}>View profile</Link>
+          <Link to="/pharmacists/$slug" params={{ slug: p.slug }}>
+            View profile
+          </Link>
         </Button>
       </div>
     </article>

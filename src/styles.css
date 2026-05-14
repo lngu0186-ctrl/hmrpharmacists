@@ -81,7 +81,7 @@
   --warning-foreground: oklch(0.25 0.05 60);
 
   /* Trust / verified accent — teal */
-  --trust: oklch(0.58 0.10 195);
+  --trust: oklch(0.58 0.1 195);
   --trust-foreground: oklch(0.99 0 0);
 
   --border: oklch(0.92 0.012 230);
@@ -89,9 +89,14 @@
   --ring: oklch(0.52 0.13 235);
 
   /* Reusable design tokens */
-  --gradient-hero: linear-gradient(135deg, oklch(0.97 0.02 230) 0%, oklch(0.94 0.04 215) 60%, oklch(0.92 0.05 195) 100%);
+  --gradient-hero: linear-gradient(
+    135deg,
+    oklch(0.97 0.02 230) 0%,
+    oklch(0.94 0.04 215) 60%,
+    oklch(0.92 0.05 195) 100%
+  );
   --gradient-soft: linear-gradient(180deg, oklch(0.99 0.005 230) 0%, oklch(0.96 0.015 225) 100%);
-  --gradient-trust: linear-gradient(135deg, oklch(0.55 0.12 220), oklch(0.6 0.10 195));
+  --gradient-trust: linear-gradient(135deg, oklch(0.55 0.12 220), oklch(0.6 0.1 195));
   --shadow-soft: 0 1px 2px 0 oklch(0.5 0.05 240 / 0.04), 0 4px 16px -4px oklch(0.5 0.05 240 / 0.08);
   --shadow-elevated: 0 8px 32px -8px oklch(0.4 0.08 240 / 0.18);
 }
@@ -120,7 +125,7 @@
   --success-foreground: oklch(0.16 0.02 245);
   --warning: oklch(0.8 0.14 75);
   --warning-foreground: oklch(0.16 0.02 245);
-  --trust: oklch(0.7 0.10 195);
+  --trust: oklch(0.7 0.1 195);
   --trust-foreground: oklch(0.16 0.02 245);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
@@ -128,22 +133,44 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html { scroll-behavior: smooth; }
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
 }
 
 @layer utilities {
-  .bg-hero { background-image: var(--gradient-hero); }
-  .bg-soft { background-image: var(--gradient-soft); }
-  .bg-trust { background-image: var(--gradient-trust); }
-  .shadow-soft { box-shadow: var(--shadow-soft); }
-  .shadow-elevated { box-shadow: var(--shadow-elevated); }
-  .text-balance { text-wrap: balance; }
+  .bg-hero {
+    background-image: var(--gradient-hero);
+  }
+  .bg-soft {
+    background-image: var(--gradient-soft);
+  }
+  .bg-trust {
+    background-image: var(--gradient-trust);
+  }
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
 }

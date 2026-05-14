@@ -3,7 +3,6 @@ import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
 const FROM = "HMR Pharmacist Exchange <onboarding@resend.dev>";
 const SITE_URL = "https://hmrpharmacists.com.au";
@@ -24,7 +23,7 @@ function shell(title: string, bodyHtml: string) {
         </td></tr>
         <tr><td style="padding:18px 28px;border-top:1px solid #eef0f3;font-size:11px;color:#94a3b8;line-height:1.6;">
           You received this email from HMR Pharmacist Exchange. This is a transactional message related to your activity on the platform.<br/>
-          <a href="${SITE_URL}" style="color:#64748b;">${SITE_URL.replace("https://","")}</a>
+          <a href="${SITE_URL}" style="color:#64748b;">${SITE_URL.replace("https://", "")}</a>
         </td></tr>
       </table>
     </td></tr>
@@ -38,7 +37,10 @@ function p(text: string) {
   return `<p style="margin:0 0 14px;font-size:14px;line-height:1.6;color:#334155;">${text}</p>`;
 }
 function esc(s: string) {
-  return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string));
+  return String(s ?? "").replace(
+    /[&<>"']/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string,
+  );
 }
 
 async function logEmail(entry: {
@@ -167,9 +169,11 @@ async function isAdmin(userId: string): Promise<boolean> {
 
 export const sendEnquiryEmails = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
-    z.object({
-      enquiry_id: z.string().uuid(),
-    }).parse(d),
+    z
+      .object({
+        enquiry_id: z.string().uuid(),
+      })
+      .parse(d),
   )
   .handler(async ({ data }) => {
     const { data: enq, error } = await supabaseAdmin
@@ -217,10 +221,16 @@ export const sendEnquiryEmails = createServerFn({ method: "POST" })
         `,
       );
       try {
-        await resendSend(ph.email, `New HMR enquiry from ${enq.sender_name}`, html, enq.sender_email, {
-          template_name: "enquiry.pharmacist_notification",
-          metadata: { enquiry_id: enq.id, pharmacist_id: enq.pharmacist_id },
-        });
+        await resendSend(
+          ph.email,
+          `New HMR enquiry from ${enq.sender_name}`,
+          html,
+          enq.sender_email,
+          {
+            template_name: "enquiry.pharmacist_notification",
+            metadata: { enquiry_id: enq.id, pharmacist_id: enq.pharmacist_id },
+          },
+        );
       } catch (e) {
         console.error("[email] pharmacist notify failed", e);
       }
@@ -255,11 +265,13 @@ export const sendEnquiryEmails = createServerFn({ method: "POST" })
 export const sendVerificationEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({
-      pharmacist_id: z.string().uuid(),
-      status: z.enum(["verified", "rejected", "pending"]),
-      notes: z.string().max(2000).optional(),
-    }).parse(d),
+    z
+      .object({
+        pharmacist_id: z.string().uuid(),
+        status: z.enum(["verified", "rejected", "pending"]),
+        notes: z.string().max(2000).optional(),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     if (!(await isAdmin(context.userId))) {
@@ -308,7 +320,11 @@ export const sendVerificationEmail = createServerFn({ method: "POST" })
     try {
       await resendSend(ph.email, subject, html, undefined, {
         template_name: `verification.${data.status}`,
-        metadata: { pharmacist_id: data.pharmacist_id, status: data.status, notes: data.notes ?? null },
+        metadata: {
+          pharmacist_id: data.pharmacist_id,
+          status: data.status,
+          notes: data.notes ?? null,
+        },
       });
     } catch (e) {
       console.error("[email] verification email failed", e);

@@ -44,14 +44,21 @@ export function TagManager({
     }
     setBusy(true);
     try {
-      const payload: Record<string, unknown> = { pharmacist_id: pharmacistId, [valueColumn]: value };
+      const payload: Record<string, unknown> = {
+        pharmacist_id: pharmacistId,
+        [valueColumn]: value,
+      };
       if (metaColumn && draftMeta.trim()) payload[metaColumn] = draftMeta.trim();
-      const { data, error } = await supabase.from(table).insert(payload as never).select("*").single();
+      const { data, error } = await supabase
+        .from(table)
+        .insert(payload as never)
+        .select("*")
+        .single();
       if (error) throw error;
       const newItem: Item = {
         id: (data as any).id,
         value: (data as any)[valueColumn],
-        meta: metaColumn ? (data as any)[metaColumn] ?? undefined : undefined,
+        meta: metaColumn ? ((data as any)[metaColumn] ?? undefined) : undefined,
       };
       onChange([...items, newItem]);
       setDraft("");
@@ -76,7 +83,9 @@ export function TagManager({
     }
   };
 
-  const remaining = suggestions.filter((s) => !items.some((i) => i.value.toLowerCase() === s.toLowerCase()));
+  const remaining = suggestions.filter(
+    (s) => !items.some((i) => i.value.toLowerCase() === s.toLowerCase()),
+  );
 
   return (
     <div>
@@ -89,9 +98,14 @@ export function TagManager({
       </div>
 
       <div className="mt-3 flex flex-wrap gap-1.5">
-        {items.length === 0 && <span className="text-xs text-muted-foreground">None added yet.</span>}
+        {items.length === 0 && (
+          <span className="text-xs text-muted-foreground">None added yet.</span>
+        )}
         {items.map((i) => (
-          <span key={i.id} className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary">
+          <span
+            key={i.id}
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary"
+          >
             {i.value}
             {i.meta && <span className="text-primary/70">— {i.meta}</span>}
             <button
@@ -126,7 +140,12 @@ export function TagManager({
         <Input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); add(); } }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              add();
+            }
+          }}
           placeholder={`Add ${title.toLowerCase()}…`}
           className="h-9 max-w-xs"
           maxLength={120}
@@ -140,7 +159,12 @@ export function TagManager({
             maxLength={120}
           />
         )}
-        <Button size="sm" variant="secondary" onClick={() => add()} disabled={busy || !draft.trim()}>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => add()}
+          disabled={busy || !draft.trim()}
+        >
           <Plus className="mr-1 h-3.5 w-3.5" /> Add
         </Button>
       </div>

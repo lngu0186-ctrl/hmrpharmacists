@@ -54,7 +54,10 @@ export function PhotoUploader({
         const idx = photoUrl.indexOf(marker);
         if (idx >= 0) {
           const oldPath = photoUrl.slice(idx + marker.length);
-          supabase.storage.from("pharmacist-photos").remove([oldPath]).catch(() => {});
+          supabase.storage
+            .from("pharmacist-photos")
+            .remove([oldPath])
+            .catch(() => {});
         }
       }
 
@@ -81,7 +84,10 @@ export function PhotoUploader({
       const idx = photoUrl.indexOf(marker);
       if (idx >= 0) {
         const oldPath = photoUrl.slice(idx + marker.length);
-        supabase.storage.from("pharmacist-photos").remove([oldPath]).catch(() => {});
+        supabase.storage
+          .from("pharmacist-photos")
+          .remove([oldPath])
+          .catch(() => {});
       }
       onChange(null);
       toast.success("Photo removed");
@@ -120,7 +126,12 @@ export function PhotoUploader({
           }}
         />
         <div className="flex flex-wrap gap-2">
-          <Button size="sm" variant="outline" disabled={busy} onClick={() => fileRef.current?.click()}>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={busy}
+            onClick={() => fileRef.current?.click()}
+          >
             <Upload className="mr-1.5 h-3.5 w-3.5" /> {photoUrl ? "Replace" : "Upload"} photo
           </Button>
           {photoUrl && (
@@ -129,7 +140,9 @@ export function PhotoUploader({
             </Button>
           )}
         </div>
-        <p className="text-[11px] text-muted-foreground">JPG, PNG or WebP · max 4 MB · square works best.</p>
+        <p className="text-[11px] text-muted-foreground">
+          JPG, PNG or WebP · max 4 MB · square works best.
+        </p>
       </div>
     </div>
   );

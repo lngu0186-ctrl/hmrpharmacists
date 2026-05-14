@@ -41,11 +41,15 @@ function PublicContentPage() {
           <>
             <header>
               <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{data.title}</h1>
-              <p className="mt-2 text-xs text-muted-foreground">Updated {new Date(data.updated_at).toLocaleDateString("en-AU")}</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Updated {new Date(data.updated_at).toLocaleDateString("en-AU")}
+              </p>
             </header>
             <div
               className="prose-content mt-6"
-              dangerouslySetInnerHTML={{ __html: renderMarkdown((data.body as any)?.markdown ?? "") }}
+              dangerouslySetInnerHTML={{
+                __html: renderMarkdown((data.body as any)?.markdown ?? ""),
+              }}
             />
           </>
         )}

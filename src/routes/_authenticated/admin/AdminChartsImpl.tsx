@@ -1,4 +1,16 @@
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, PieChart, Pie, Cell, Legend } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
 import { Card } from "@/components/ui/card";
 import type { ChartProps } from "./AdminCharts";
 
@@ -11,8 +23,18 @@ export default function AdminChartsImpl({ statusData, stateData }: ChartProps) {
         <h3 className="mb-4 text-sm font-medium">Verification status</h3>
         <ResponsiveContainer width="100%" height={220}>
           <PieChart>
-            <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80}>
-              {statusData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+            <Pie
+              data={statusData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius={50}
+              outerRadius={80}
+            >
+              {statusData.map((_, i) => (
+                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+              ))}
             </Pie>
             <Tooltip />
             <Legend />

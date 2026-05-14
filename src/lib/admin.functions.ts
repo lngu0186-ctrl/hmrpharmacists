@@ -16,17 +16,22 @@ async function isAdmin(userId: string): Promise<boolean> {
 export const setPharmacistStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({
-      pharmacist_id: z.string().uuid(),
-      status: z.enum(["verified", "rejected", "pending"]),
-      publish: z.boolean().optional(),
-    }).parse(d),
+    z
+      .object({
+        pharmacist_id: z.string().uuid(),
+        status: z.enum(["verified", "rejected", "pending"]),
+        publish: z.boolean().optional(),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     if (!(await isAdmin(context.userId))) {
       throw new Response("Forbidden", { status: 403 });
     }
-    const update: { verification_status: "verified" | "rejected" | "pending"; is_published?: boolean } = {
+    const update: {
+      verification_status: "verified" | "rejected" | "pending";
+      is_published?: boolean;
+    } = {
       verification_status: data.status,
     };
     if (data.publish !== undefined) update.is_published = data.publish;
@@ -41,10 +46,12 @@ export const setPharmacistStatus = createServerFn({ method: "POST" })
 export const togglePharmacistPublish = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({
-      pharmacist_id: z.string().uuid(),
-      is_published: z.boolean(),
-    }).parse(d),
+    z
+      .object({
+        pharmacist_id: z.string().uuid(),
+        is_published: z.boolean(),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     if (!(await isAdmin(context.userId))) {
