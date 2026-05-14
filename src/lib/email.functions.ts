@@ -270,7 +270,10 @@ export const sendVerificationEmail = createServerFn({ method: "POST" })
     }
 
     try {
-      await resendSend(ph.email, subject, html);
+      await resendSend(ph.email, subject, html, undefined, {
+        template_name: `verification.${data.status}`,
+        metadata: { pharmacist_id: data.pharmacist_id, status: data.status, notes: data.notes ?? null },
+      });
     } catch (e) {
       console.error("[email] verification email failed", e);
       return { ok: false };
