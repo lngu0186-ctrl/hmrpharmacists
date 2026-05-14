@@ -7,7 +7,7 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LayoutDashboard, UserCog, ShieldCheck, LogOut, FileText, ImageIcon } from "lucide-react";
+import { LayoutDashboard, UserCog, ShieldCheck, LogOut, FileText, ImageIcon, Inbox } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { Button } from "@/components/ui/button";
 import { useAuth, signOut } from "@/hooks/use-auth";
@@ -34,6 +34,7 @@ function AuthedLayout() {
 
   const links = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/inbox", label: "Inbox", icon: Inbox },
     { to: "/profile", label: "My profile", icon: ImageIcon },
     { to: "/onboarding", label: "Edit details", icon: UserCog },
     ...(isAdmin

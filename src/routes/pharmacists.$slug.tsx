@@ -303,6 +303,8 @@ function EnquiryForm({ pharmacistId }: { pharmacistId: string }) {
     mutationFn: async (values: typeof form) => {
       const parsed = enquirySchema.safeParse(values);
       if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Invalid input");
+      const { data: sessionData } = await supabase.auth.getSession();
+      const senderUserId = sessionData.session?.user?.id ?? null;
       const { data, error } = await supabase
         .from("enquiries")
         .insert({
@@ -315,6 +317,7 @@ function EnquiryForm({ pharmacistId }: { pharmacistId: string }) {
           patient_suburb: parsed.data.patient_suburb || null,
           message: parsed.data.message,
           consent_given: true,
+          sender_user_id: senderUserId,
         })
         .select("id, reference_code")
         .single();
