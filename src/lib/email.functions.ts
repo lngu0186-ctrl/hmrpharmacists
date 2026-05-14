@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
@@ -89,14 +90,15 @@ async function resendSend(
       body: JSON.stringify({ from: FROM, to: [to], subject, html, reply_to: replyTo ?? REPLY_TO }),
     });
     body = await res.text();
-  } catch (e: any) {
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
     if (logCtx) {
       await logEmail({
         template_name: logCtx.template_name,
         recipient_email: to,
         subject,
         status: "failed",
-        error_message: `Network error: ${e?.message ?? String(e)}`,
+        error_message: `Network error: ${msg}`,
         metadata: logCtx.metadata,
       });
     }
@@ -121,7 +123,9 @@ async function resendSend(
   let messageId: string | null = null;
   try {
     messageId = JSON.parse(body)?.id ?? null;
-  } catch {}
+  } catch {
+    // ignore
+  }
   if (logCtx) {
     await logEmail({
       template_name: logCtx.template_name,
@@ -147,7 +151,19 @@ async function getPharmacistEmail(pharmacistId: string) {
   return { email: u.user.email, full_name: ph.full_name, slug: ph.slug };
 }
 
-/* ========== Enquiry notifications ========== */
+async function isAdmin(userId: string): Promise<boolean> {
+  const { data } = await supabaseAdmin
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .maybeSingle();
+  return !!data;
+}
+
+/* ========== Enquiry notifications ==========
+ * Public (anonymous) callable but idempotent per enquiry_id and rate-bound to
+ * recently-created enquiries. This makes replay attacks ineffective. */
 
 export const sendEnquiryEmails = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
@@ -161,11 +177,28 @@ export const sendEnquiryEmails = createServerFn({ method: "POST" })
       .select("*")
       .eq("id", data.enquiry_id)
       .maybeSingle();
-    if (error || !enq) throw new Error("Enquiry not found");
+    if (error || !enq) {
+      // Don't leak existence — return ok regardless.
+      return { ok: true };
+    }
+
+    // Reject replays: only send for enquiries created in the last 10 minutes.
+    const ageMs = Date.now() - new Date(enq.created_at).getTime();
+    if (ageMs > 10 * 60 * 1000) return { ok: true };
+
+    // Idempotency: don't re-send if we've already logged a successful send for this enquiry.
+    const { data: existing } = await supabaseAdmin
+      .from("email_send_log")
+      .select("id")
+      .eq("status", "sent")
+      .like("template_name", "enquiry.%")
+      .filter("metadata->>enquiry_id", "eq", enq.id)
+      .limit(1)
+      .maybeSingle();
+    if (existing) return { ok: true, deduplicated: true };
 
     const ph = await getPharmacistEmail(enq.pharmacist_id);
 
-    // 1) Pharmacist notification
     if (ph?.email) {
       const dashUrl = `${SITE_URL}/dashboard`;
       const html = shell(
@@ -193,7 +226,6 @@ export const sendEnquiryEmails = createServerFn({ method: "POST" })
       }
     }
 
-    // 2) Sender confirmation
     const senderHtml = shell(
       `We've passed your enquiry on`,
       `${p(`Hi ${esc(enq.sender_name.split(" ")[0])},`)}
@@ -218,9 +250,10 @@ export const sendEnquiryEmails = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/* ========== Verification status emails ========== */
+/* ========== Verification status emails — admin only ========== */
 
 export const sendVerificationEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
     z.object({
       pharmacist_id: z.string().uuid(),
@@ -228,7 +261,10 @@ export const sendVerificationEmail = createServerFn({ method: "POST" })
       notes: z.string().max(2000).optional(),
     }).parse(d),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    if (!(await isAdmin(context.userId))) {
+      throw new Response("Forbidden", { status: 403 });
+    }
 
     const ph = await getPharmacistEmail(data.pharmacist_id);
     if (!ph?.email) return { ok: false, reason: "no_email" };

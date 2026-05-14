@@ -61,7 +61,15 @@ function Hero() {
         </div>
         <div className="relative">
           <div className="absolute -inset-4 -z-10 rounded-3xl bg-trust/10 blur-2xl" />
-          <img src={heroImg} alt="Credentialed pharmacist conducting a Home Medicines Review with a patient" className="aspect-[4/3] w-full rounded-2xl object-cover shadow-elevated" />
+          <img
+            src={heroImg}
+            alt="Credentialed pharmacist conducting a Home Medicines Review with a patient"
+            width={1200}
+            height={900}
+            fetchPriority="high"
+            decoding="async"
+            className="aspect-[4/3] w-full rounded-2xl object-cover shadow-elevated"
+          />
           <div className="absolute -bottom-5 -left-5 hidden rounded-xl border border-border bg-card p-4 shadow-elevated sm:block">
             <div className="flex items-center gap-3">
               <span className="grid h-10 w-10 place-items-center rounded-full bg-success/10 text-success"><ShieldCheck className="h-5 w-5" /></span>
