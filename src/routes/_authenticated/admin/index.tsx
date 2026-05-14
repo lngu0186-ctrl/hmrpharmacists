@@ -37,6 +37,39 @@ function AdminPage() {
   const sendVerification = useServerFn(sendVerificationEmail);
   const setStatusFn = useServerFn(setPharmacistStatus);
   const togglePublishFn = useServerFn(togglePharmacistPublish);
+  const listUsersFn = useServerFn(listUsers);
+  const setUserRoleFn = useServerFn(setUserRole);
+  const deleteUserFn = useServerFn(deleteUser);
+  const [userSearch, setUserSearch] = useState("");
+  const [userPage, setUserPage] = useState(1);
+
+  const { data: usersData } = useQuery({
+    queryKey: ["admin-users", userSearch, userPage],
+    queryFn: () => listUsersFn({ data: { search: userSearch, page: userPage, perPage: 50 } }),
+    placeholderData: (prev) => prev,
+  });
+  const users = usersData?.users ?? [];
+
+  const toggleRole = async (userId: string, hasAdmin: boolean) => {
+    try {
+      await setUserRoleFn({ data: { user_id: userId, role: "admin", grant: !hasAdmin } });
+      toast.success(hasAdmin ? "Admin revoked" : "Admin granted");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Update failed");
+    }
+  };
+
+  const removeUser = async (userId: string, email: string | null) => {
+    if (!confirm(`Delete user ${email ?? userId}? This cannot be undone.`)) return;
+    try {
+      await deleteUserFn({ data: { user_id: userId } });
+      toast.success("User deleted");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Delete failed");
+    }
+  };
 
   const { data: pharmacists = [] } = useQuery({
     queryKey: ["admin-pharmacists"],
