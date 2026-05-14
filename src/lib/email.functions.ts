@@ -260,6 +260,108 @@ export const sendEnquiryEmails = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/* ========== Enquiry status update emails (sender-facing) ==========
+ * Server-only callable (no middleware) but invoked exclusively by
+ * updateEnquiryStatus after it has verified pharmacist ownership.
+ * Idempotent per (enquiry_id, status). */
+
+export const sendEnquiryStatusEmail = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        enquiry_id: z.string().uuid(),
+        status: z.enum(["accepted", "declined", "responded", "closed"]),
+        decline_reason: z.string().max(500).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { data: enq } = await supabaseAdmin
+      .from("enquiries")
+      .select("id, sender_email, sender_name, reference_code, pharmacist_id")
+      .eq("id", data.enquiry_id)
+      .maybeSingle();
+    if (!enq?.sender_email) return { ok: true };
+
+    // Idempotency: skip if we've already logged a successful send for
+    // this (enquiry_id, status) pair.
+    const tmpl = `enquiry.status.${data.status}`;
+    const { data: existing } = await supabaseAdmin
+      .from("email_send_log")
+      .select("id")
+      .eq("status", "sent")
+      .eq("template_name", tmpl)
+      .filter("metadata->>enquiry_id", "eq", enq.id)
+      .limit(1)
+      .maybeSingle();
+    if (existing) return { ok: true, deduplicated: true };
+
+    const { data: ph } = await supabaseAdmin
+      .from("pharmacists")
+      .select("full_name, slug")
+      .eq("id", enq.pharmacist_id)
+      .maybeSingle();
+
+    const ref = enq.reference_code ?? "";
+    const phName = ph?.full_name ?? "your pharmacist";
+    const profileUrl = ph?.slug ? `${SITE_URL}/pharmacists/${ph.slug}` : `${SITE_URL}/find`;
+
+    let subject = "";
+    let html = "";
+    const greet = `Hi ${esc(enq.sender_name.split(" ")[0])},`;
+    const refLine = ref
+      ? `<p style="margin:0 0 14px;font-size:12px;color:#64748b;">Reference: <strong>${esc(ref)}</strong></p>`
+      : "";
+
+    if (data.status === "accepted") {
+      subject = `${phName} accepted your HMR enquiry (${ref})`;
+      html = shell(
+        `Your enquiry was accepted`,
+        `${p(greet)}${refLine}
+         ${p(`Good news — <strong>${esc(phName)}</strong> has accepted your enquiry and will be in touch directly. Replies will come from their email, not this address.`)}
+         <p style="margin:18px 0 6px;">${btn(profileUrl, "View pharmacist profile")}</p>`,
+      );
+    } else if (data.status === "responded") {
+      subject = `${phName} has responded to your HMR enquiry (${ref})`;
+      html = shell(
+        `${esc(phName)} has responded`,
+        `${p(greet)}${refLine}
+         ${p(`The pharmacist has replied to your enquiry directly via email. Please check your inbox (including spam) for a message from them.`)}
+         ${p(`<span style="color:#64748b;font-size:12px;">If nothing arrives within a business day, you can re-submit via the directory.</span>`)}
+         <p style="margin:18px 0 6px;">${btn(`${SITE_URL}/find`, "Browse the directory")}</p>`,
+      );
+    } else if (data.status === "declined") {
+      subject = `${phName} is unable to take your HMR enquiry (${ref})`;
+      html = shell(
+        `Unable to accept this referral`,
+        `${p(greet)}${refLine}
+         ${p(`Unfortunately <strong>${esc(phName)}</strong> isn't able to take this referral right now.`)}
+         ${data.decline_reason ? `<table role="presentation" width="100%" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;margin:0 0 18px;font-size:13px;color:#334155;"><tr><td><strong style="color:#0f172a;">Reason:</strong><br/>${esc(data.decline_reason)}</td></tr></table>` : ""}
+         ${p(`You can browse other credentialed HMR pharmacists who may be available in the patient's area.`)}
+         <p style="margin:18px 0 6px;">${btn(`${SITE_URL}/find`, "Find another pharmacist")}</p>`,
+      );
+    } else {
+      subject = `Your HMR enquiry has been closed (${ref})`;
+      html = shell(
+        `Enquiry closed`,
+        `${p(greet)}${refLine}
+         ${p(`This enquiry has now been marked as closed by the pharmacist.`)}
+         <p style="margin:18px 0 6px;">${btn(`${SITE_URL}/find`, "Browse the directory")}</p>`,
+      );
+    }
+
+    try {
+      await resendSend(enq.sender_email, subject, html, undefined, {
+        template_name: tmpl,
+        metadata: { enquiry_id: enq.id, status: data.status },
+      });
+    } catch (e) {
+      console.error("[email] enquiry status email failed", e);
+      return { ok: false };
+    }
+    return { ok: true };
+  });
+
 /* ========== Verification status emails — admin only ========== */
 
 export const sendVerificationEmail = createServerFn({ method: "POST" })
