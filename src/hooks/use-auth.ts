@@ -6,6 +6,7 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isVerifiedPharmacist, setIsVerifiedPharmacist] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,7 +23,11 @@ export function useAuth() {
   }, []);
 
   useEffect(() => {
-    if (!user) return setIsAdmin(false);
+    if (!user) {
+      setIsAdmin(false);
+      setIsVerifiedPharmacist(false);
+      return;
+    }
     supabase
       .from("user_roles")
       .select("role")
@@ -30,9 +35,15 @@ export function useAuth() {
       .eq("role", "admin")
       .maybeSingle()
       .then(({ data }) => setIsAdmin(!!data));
+    supabase
+      .from("pharmacists")
+      .select("verification_status")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => setIsVerifiedPharmacist(data?.verification_status === "verified"));
   }, [user]);
 
-  return { session, user, isAdmin, loading };
+  return { session, user, isAdmin, isVerifiedPharmacist, loading };
 }
 
 export async function signOut() {
