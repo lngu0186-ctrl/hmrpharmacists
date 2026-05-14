@@ -18,11 +18,11 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({ meta: [{ title: "Admin — HMR Pharmacist Exchange" }, { name: "robots", content: "noindex" }] }),
 });
 
-const COLORS = ["var(--primary)", "var(--accent)", "var(--destructive)", "var(--success)"];
-
 function AdminPage() {
   const qc = useQueryClient();
   const sendVerification = useServerFn(sendVerificationEmail);
+  const setStatusFn = useServerFn(setPharmacistStatus);
+  const togglePublishFn = useServerFn(togglePharmacistPublish);
 
   const { data: pharmacists = [] } = useQuery({
     queryKey: ["admin-pharmacists"],
@@ -80,21 +80,25 @@ function AdminPage() {
   }, [pharmacists, enquiries]);
 
   const setStatus = async (id: string, status: "verified" | "rejected" | "pending", publish?: boolean) => {
-    const update: any = { verification_status: status };
-    if (publish !== undefined) update.is_published = publish;
-    const { error } = await supabase.from("pharmacists").update(update).eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Updated");
-    sendVerification({ data: { pharmacist_id: id, status } })
-      .then((r: any) => { if (r?.ok) toast.success("Notification email sent"); })
-      .catch((e) => console.error("verification email failed", e));
-    qc.invalidateQueries({ queryKey: ["admin-pharmacists"] });
+    try {
+      await setStatusFn({ data: { pharmacist_id: id, status, publish } });
+      toast.success("Updated");
+      sendVerification({ data: { pharmacist_id: id, status } })
+        .then((r) => { if (r?.ok) toast.success("Notification email sent"); })
+        .catch((e) => console.error("verification email failed", e));
+      qc.invalidateQueries({ queryKey: ["admin-pharmacists"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Update failed");
+    }
   };
 
   const togglePublish = async (id: string, current: boolean) => {
-    const { error } = await supabase.from("pharmacists").update({ is_published: !current }).eq("id", id);
-    if (error) return toast.error(error.message);
-    qc.invalidateQueries({ queryKey: ["admin-pharmacists"] });
+    try {
+      await togglePublishFn({ data: { pharmacist_id: id, is_published: !current } });
+      qc.invalidateQueries({ queryKey: ["admin-pharmacists"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Update failed");
+    }
   };
 
   return (
