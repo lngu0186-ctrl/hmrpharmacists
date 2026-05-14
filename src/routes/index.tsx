@@ -87,7 +87,7 @@ function Hero() {
             <Stat label="Verified profiles" value="Manual review" />
             <Stat 
               label="Consultants" 
-              value={"AHPRA-registered, ACP-credentialed\nConsultant Pharmacists"} 
+              value={"AHPRA-registered, ACP-credentialed \nConsultant Pharmacists"} 
             />
             <Stat label="Coverage" value="Metro & regional" />
           </dl>
