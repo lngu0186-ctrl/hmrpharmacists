@@ -71,7 +71,7 @@ export const updateEnquiryStatus = createServerFn({ method: "POST" })
           status: data.status,
           decline_reason: data.decline_reason,
         },
-      }).catch((e) => console.error("[enquiry] status email failed", e));
+      }).catch((e: unknown) => console.error("[enquiry] status email failed", e));
     }
 
     return { ok: true };
