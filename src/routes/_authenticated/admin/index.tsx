@@ -166,6 +166,31 @@ function AdminPage() {
             ))}
           </Card>
         </TabsContent>
+
+        <TabsContent value="emails">
+          <Card className="divide-y divide-border">
+            {emailLog.length === 0 && <p className="p-8 text-center text-sm text-muted-foreground">No emails sent yet.</p>}
+            {emailLog.map((row: any) => (
+              <div key={row.id} className="grid gap-1 p-4 text-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge
+                    variant="outline"
+                    className={`text-[10px] capitalize ${row.status === "sent" ? "border-success/40 text-success" : "border-destructive/40 text-destructive"}`}
+                  >
+                    {row.status}
+                  </Badge>
+                  <span className="font-medium">{row.template_name}</span>
+                  <span className="text-xs text-muted-foreground">→ {row.recipient_email}</span>
+                  <span className="ml-auto text-[11px] text-muted-foreground">{new Date(row.created_at).toLocaleString("en-AU")}</span>
+                </div>
+                {row.subject && <p className="text-xs text-muted-foreground">{row.subject}</p>}
+                {row.error_message && (
+                  <p className="text-xs text-destructive font-mono break-all">{row.error_message}</p>
+                )}
+              </div>
+            ))}
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
