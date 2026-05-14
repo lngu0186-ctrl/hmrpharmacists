@@ -28,7 +28,7 @@ async function logAudit(
   });
 }
 
-type AppRole = "admin" | "pharmacist" | "user";
+
 
 export const listUsers = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
