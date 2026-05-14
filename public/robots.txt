@@ -1,3 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /onboarding
+Disallow: /profile
 Disallow: /auth
+
+Sitemap: https://hmrpharmacists.com.au/sitemap.xml

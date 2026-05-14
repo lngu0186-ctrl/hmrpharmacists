@@ -1,13 +1,21 @@
 // Tiny markdown subset renderer (no deps) — headings, paragraphs, bold/italic/links, lists.
 function escape(s: string) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function safeHref(url: string): string {
+  const trimmed = url.trim();
+  // Only allow http(s), mailto, tel, and relative/anchor links. Block javascript:, data:, vbscript:, etc.
+  if (/^(https?:\/\/|mailto:|tel:|\/|#)/i.test(trimmed)) return escape(trimmed);
+  return "#";
 }
 function inline(s: string) {
   return escape(s)
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     .replace(/`([^`]+)`/g, '<code class="rounded bg-muted px-1 py-0.5 text-sm">$1</code>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary underline-offset-4 hover:underline">$1</a>');
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, text: string, href: string) =>
+      `<a href="${safeHref(href)}" rel="noopener noreferrer" class="text-primary underline-offset-4 hover:underline">${text}</a>`,
+    );
 }
 export function renderMarkdown(md: string): string {
   const lines = md.split(/\r?\n/);
