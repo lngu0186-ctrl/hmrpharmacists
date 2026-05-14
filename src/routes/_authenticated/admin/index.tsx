@@ -16,6 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "@tanstack/react-router";
+import { Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { sendVerificationEmail } from "@/lib/email.functions";
@@ -504,6 +506,11 @@ function PharmacistRow({
         </div>
       </div>
       <div className="flex flex-wrap gap-2">
+        <Button asChild size="sm" variant="outline">
+          <Link to="/admin/pharmacists/$id" params={{ id: p.id }}>
+            <Pencil className="mr-1 h-3.5 w-3.5" /> Edit
+          </Link>
+        </Button>
         <Button size="sm" variant="outline" onClick={onTogglePublish}>
           {p.is_published ? (
             <>

@@ -33,6 +33,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated/admin/content'
+import { Route as AuthenticatedAdminPharmacistsIdRouteImport } from './routes/_authenticated/admin/pharmacists.$id'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -154,6 +155,12 @@ const AuthenticatedAdminContentRoute =
     path: '/content',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminPharmacistsIdRoute =
+  AuthenticatedAdminPharmacistsIdRouteImport.update({
+    id: '/pharmacists/$id',
+    path: '/pharmacists/$id',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/register/invite': typeof RegisterInviteRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/pharmacists/$id': typeof AuthenticatedAdminPharmacistsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -203,6 +211,7 @@ export interface FileRoutesByTo {
   '/register/invite': typeof RegisterInviteRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/pharmacists/$id': typeof AuthenticatedAdminPharmacistsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -230,6 +239,7 @@ export interface FileRoutesById {
   '/register/invite': typeof RegisterInviteRoute
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/pharmacists/$id': typeof AuthenticatedAdminPharmacistsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -257,6 +267,7 @@ export interface FileRouteTypes {
     | '/register/invite'
     | '/admin/content'
     | '/admin/'
+    | '/admin/pharmacists/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -281,6 +292,7 @@ export interface FileRouteTypes {
     | '/register/invite'
     | '/admin/content'
     | '/admin'
+    | '/admin/pharmacists/$id'
   id:
     | '__root__'
     | '/'
@@ -307,6 +319,7 @@ export interface FileRouteTypes {
     | '/register/invite'
     | '/_authenticated/admin/content'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/pharmacists/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -498,17 +511,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminContentRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/pharmacists/$id': {
+      id: '/_authenticated/admin/pharmacists/$id'
+      path: '/pharmacists/$id'
+      fullPath: '/admin/pharmacists/$id'
+      preLoaderRoute: typeof AuthenticatedAdminPharmacistsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminPharmacistsIdRoute: typeof AuthenticatedAdminPharmacistsIdRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminContentRoute: AuthenticatedAdminContentRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminPharmacistsIdRoute: AuthenticatedAdminPharmacistsIdRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
