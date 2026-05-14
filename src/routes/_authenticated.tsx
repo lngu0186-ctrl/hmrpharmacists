@@ -34,6 +34,7 @@ function AuthedLayout() {
 
   const links = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/inbox", label: "Inbox", icon: Inbox },
     { to: "/profile", label: "My profile", icon: ImageIcon },
     { to: "/onboarding", label: "Edit details", icon: UserCog },
     ...(isAdmin
