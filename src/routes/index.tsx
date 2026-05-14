@@ -85,7 +85,10 @@ function Hero() {
           </div>
           <dl className="mt-10 grid grid-cols-3 gap-6 border-t border-border pt-6 text-sm">
             <Stat label="Verified profiles" value="Manual review" />
-            <Stat label="Privacy-safe" value="No PHI in MVP" />
+            <Stat 
+              label="Consultants" 
+              value={"AHPRA-registered, ACP-credentialed\nConsultant Pharmacists"} 
+            />
             <Stat label="Coverage" value="Metro & regional" />
           </dl>
         </div>
