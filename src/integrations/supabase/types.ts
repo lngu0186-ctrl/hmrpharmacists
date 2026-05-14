@@ -152,49 +152,58 @@ export type Database = {
         Row: {
           consent_given: boolean
           created_at: string
+          decline_reason: string | null
           id: string
           message: string
           organisation: string | null
           patient_postcode: string | null
           patient_suburb: string | null
           pharmacist_id: string
+          reference_code: string | null
           sender_email: string
           sender_name: string
           sender_phone: string | null
           sender_type: Database["public"]["Enums"]["enquiry_sender_type"]
           status: Database["public"]["Enums"]["enquiry_status"]
+          status_updated_at: string | null
           updated_at: string
         }
         Insert: {
           consent_given?: boolean
           created_at?: string
+          decline_reason?: string | null
           id?: string
           message: string
           organisation?: string | null
           patient_postcode?: string | null
           patient_suburb?: string | null
           pharmacist_id: string
+          reference_code?: string | null
           sender_email: string
           sender_name: string
           sender_phone?: string | null
           sender_type: Database["public"]["Enums"]["enquiry_sender_type"]
           status?: Database["public"]["Enums"]["enquiry_status"]
+          status_updated_at?: string | null
           updated_at?: string
         }
         Update: {
           consent_given?: boolean
           created_at?: string
+          decline_reason?: string | null
           id?: string
           message?: string
           organisation?: string | null
           patient_postcode?: string | null
           patient_suburb?: string | null
           pharmacist_id?: string
+          reference_code?: string | null
           sender_email?: string
           sender_name?: string
           sender_phone?: string | null
           sender_type?: Database["public"]["Enums"]["enquiry_sender_type"]
           status?: Database["public"]["Enums"]["enquiry_status"]
+          status_updated_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -597,7 +606,13 @@ export type Database = {
     Enums: {
       app_role: "admin" | "pharmacist" | "user"
       enquiry_sender_type: "patient" | "gp" | "clinic" | "pharmacy"
-      enquiry_status: "new" | "acknowledged" | "responded" | "closed"
+      enquiry_status:
+        | "new"
+        | "acknowledged"
+        | "responded"
+        | "closed"
+        | "accepted"
+        | "declined"
       verification_status:
         | "pending"
         | "verified"
@@ -733,7 +748,14 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "pharmacist", "user"],
       enquiry_sender_type: ["patient", "gp", "clinic", "pharmacy"],
-      enquiry_status: ["new", "acknowledged", "responded", "closed"],
+      enquiry_status: [
+        "new",
+        "acknowledged",
+        "responded",
+        "closed",
+        "accepted",
+        "declined",
+      ],
       verification_status: [
         "pending",
         "verified",
