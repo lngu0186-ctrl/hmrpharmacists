@@ -20,6 +20,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { sendVerificationEmail } from "@/lib/email.functions";
 import { setPharmacistStatus, togglePharmacistPublish } from "@/lib/admin.functions";
+import { listUsers, setUserRole, deleteUser } from "@/lib/admin-users.functions";
+import { Input } from "@/components/ui/input";
+import { Trash2, ShieldPlus, ShieldMinus } from "lucide-react";
 import { AdminCharts } from "./AdminCharts";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
