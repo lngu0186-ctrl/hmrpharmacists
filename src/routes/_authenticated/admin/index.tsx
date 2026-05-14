@@ -39,14 +39,28 @@ function AdminPage() {
     },
   });
 
-  const { data: emailLog = [] } = useQuery({
-    queryKey: ["admin-email-log"],
+  const PAGE_SIZE = 25;
+  const [emailPage, setEmailPage] = useState(0);
+  const [emailStatusFilter, setEmailStatusFilter] = useState<"all" | "sent" | "failed">("all");
+
+  const { data: emailLogPage } = useQuery({
+    queryKey: ["admin-email-log", emailPage, emailStatusFilter],
     queryFn: async () => {
-      const { data } = await supabase.from("email_send_log").select("*").order("created_at", { ascending: false }).limit(200);
-      return data ?? [];
+      let q = supabase
+        .from("email_send_log")
+        .select("*", { count: "exact" })
+        .order("created_at", { ascending: false })
+        .range(emailPage * PAGE_SIZE, emailPage * PAGE_SIZE + PAGE_SIZE - 1);
+      if (emailStatusFilter !== "all") q = q.eq("status", emailStatusFilter);
+      const { data, count } = await q;
+      return { rows: data ?? [], count: count ?? 0 };
     },
     refetchInterval: 30_000,
+    placeholderData: (prev) => prev,
   });
+  const emailLog = emailLogPage?.rows ?? [];
+  const emailLogTotal = emailLogPage?.count ?? 0;
+  const emailLogPages = Math.max(1, Math.ceil(emailLogTotal / PAGE_SIZE));
 
   const stats = useMemo(() => {
     const total = pharmacists.length;
